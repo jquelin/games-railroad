@@ -249,14 +249,15 @@ sub _on_start {
     }
 
     # playfield
-    my $fh1 = $poe_main_window->Frame->pack(-fill=>'both', -expand=>1);
-    my $canvas = $fh1->Scrolled( 'Canvas',
+    #my $fh1 = $->Frame->pack(-fill=>'both', -expand=>1);
+    my $canvas = $poe_main_window->Scrolled( 'Canvas',
         -bg         => 'white',
         -scrollbars => 'osoe',
         -width      => $NBCOLS * $TILELEN,
         -height     => $NBROWS * $TILELEN,
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
+    $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $h->{w}{c} = $canvas;
 }
 
