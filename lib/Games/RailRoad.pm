@@ -57,6 +57,10 @@ sub spawn {
             _b_quit        => \&_on_b_quit,
             _b_restart     => \&_on_b_restart,
             _tm_click      => \&_on_tm_click,
+            #
+            _b1_motion     => \&_on_b1_motion,
+            _b1_press      => \&_on_b1_press,
+            _b1_release    => \&_on_b1_release,
         },
         args => \%opts,
     );
@@ -258,6 +262,9 @@ sub _on_start {
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
     $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
+    $canvas->CanvasBind( '<ButtonPress-1>',    $s->postback('_b1_press') );
+    $canvas->CanvasBind( '<B1-ButtonRelease>', $s->postback('_b1_release') );
+    $canvas->CanvasBind( '<B1-Motion>',        $s->postback('_b1_motion') );
     $h->{w}{c} = $canvas;
 }
 
@@ -443,6 +450,17 @@ sub _on_b_restart {
     $k->yield('_open_file', $h->{file});
 }
 
+sub _on_b1_motion {
+    print "motion\n";
+}
+
+sub _on_b1_press {
+    print "press\n";
+}
+
+sub _on_b1_release {
+    print "release\n";
+}
 
 #
 # _tm_click();
