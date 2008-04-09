@@ -21,6 +21,10 @@ use POE;
 
 our $VERSION = '0.01';
 
+Readonly my $NBROWS  => 30;
+Readonly my $NBCOLS  => 40;
+Readonly my $TILELEN => 20; # in pixels
+
 #Readonly my @COLORS => ( [255,0,0], [0,0,255], [0,255,0], [255,255,0], [255,0,255], [0,255,255] );
 
 
@@ -246,17 +250,14 @@ sub _on_start {
 
     # playfield
     my $fh1 = $poe_main_window->Frame->pack(-fill=>'both', -expand=>1);
-    my $tm = $fh1->Scrolled( 'Canvas',
+    my $canvas = $fh1->Scrolled( 'Canvas',
         -bg         => 'white',
         -scrollbars => 'osoe',
-        -width      => '25c',
-        -height     => '20c',
+        -width      => $NBCOLS * $TILELEN,
+        -height     => $NBROWS * $TILELEN,
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
-    $h->{w}{canvas} = $tm;
-
-    # frame with one summary label per running ip
-    $h->{w}{f_ips} = $poe_main_window->Frame->pack(-fill=>'x');
+    $h->{w}{c} = $canvas;
 }
 
 
