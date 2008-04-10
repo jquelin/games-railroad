@@ -10,6 +10,7 @@ package Games::RailRoad;
 
 use strict;
 use warnings;
+use 5.010;
 
 use Readonly;
 use Tk; # should come before POE
@@ -254,18 +255,18 @@ sub _on_start {
 
     # playfield
     #my $fh1 = $->Frame->pack(-fill=>'both', -expand=>1);
-    my $canvas = $poe_main_window->Scrolled( 'Canvas',
+    my $c = $poe_main_window->Scrolled( 'Canvas',
         -bg         => 'white',
         -scrollbars => 'osoe',
         -width      => $NBCOLS * $TILELEN,
         -height     => $NBROWS * $TILELEN,
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
-    $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
-    $canvas->CanvasBind( '<ButtonPress-1>',    $s->postback('_b1_press') );
-    $canvas->CanvasBind( '<B1-ButtonRelease>', $s->postback('_b1_release') );
-    $canvas->CanvasBind( '<B1-Motion>',        $s->postback('_b1_motion') );
-    $h->{w}{c} = $canvas;
+    $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
+    $c->CanvasBind( '<ButtonPress-1>',    [$s->postback('_b1_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B1-ButtonRelease>', [$s->postback('_b1_release'),Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B1-Motion>',        [$s->postback('_b1_motion'), Ev('x'), Ev('y')] );
+    $h->{w}{c} = $c;
 }
 
 
@@ -455,7 +456,10 @@ sub _on_b1_motion {
 }
 
 sub _on_b1_press {
-    print "press\n";
+    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+    my $r = _resolve_coords($x,$y);
+    print "press ($r)\n";
 }
 
 sub _on_b1_release {
@@ -494,58 +498,48 @@ sub _on_tm_click {
 
 
 #
-# _create_ip_struct( $heap, $ip );
+# my ($row, $col, $region) = _resolve_coords($x,$y);
+# my $coords = _resolve_coords($x,$y);
 #
-# L::B::Debugger maintains some data associated to the running ips. this
-# sub initialize the $heap data associated to a new $ip so it can be
-# used later on.
+# the canvas deals with pixels: this sub transforms canvas coordinates
+# ($x,$y) in the $row and $col of the matching tile. it will also return
+# the region of the tile:
+#   - nw: north-west
+#   - n:  norh
+#   - ne: north-east
+#   - w:  west
+#   - c:  center
+#   - e:  east
+#   - sw: south-west
+#   - s:  south
+#   - se: south-east
 #
-# note: a new ip can be created either during befunge script loading, or
-# when encountering the 't' command (thread) since L::B supports
-# threaded befunge.
-#
-sub _create_ip_struct {
+# in scalar context, return the string "$row-$col-$region".
+# 
+sub _resolve_coords {
+    my ($x,$y) = @_;
 
-=pod
+    # easy stuff
+    my $col = int( $x/$TILELEN );
+    my $row = int( $y/$TILELEN );
 
-    my ($h, $ip) = @_;
-
-    my $bef = $h->{bef};
-    my $ips = $h->{ips};
-    my $id  = $ip->get_id;
-    my $w   = $h->{w};
-    my $tm  = $w->{tm};
-
-    # newly created ip - initializing data structure.
-    $ips->{$ip}{object} = $ip;
-
-    # - decay colors
-    my ($r,$g,$b) = exists $COLORS[$id]
-        ?  @{$COLORS[$id]}
-        : (rand(255), rand(255), rand(255));
-
-    foreach my $i ( 0 .. $DECAY-1 ) {
-        my $ri = sprintf "%02x", $r + (255-$r) / $DECAY * ($i+1);
-        my $gi = sprintf "%02x", $g + (255-$g) / $DECAY * ($i+1);
-        my $bi = sprintf "%02x", $b + (255-$b) / $DECAY * ($i+1);
-        $tm->tagConfigure( "decay-$id-$i", -bg => "#$ri$gi$bi" );
-        $ips->{$ip}{bgcolor} = "#$ri$gi$bi" if $i == 0;
+    # more complex: the region
+    $x -= $col * $TILELEN;
+    $y -= $row * $TILELEN;
+    my ($rx,$ry);
+    given ($x) {
+        when( $_ < $TILELEN / 3 )   { $rx = 'w'; }
+        when( $_ > $TILELEN * 2/3 ) { $rx = 'e'; }
+        default { $rx = ''; }
     }
-    $w->{ip}->configure( -bg => $ips->{$ip}{bgcolor} );
+    given ($y) {
+        when( $_ < $TILELEN / 3 )   { $ry = 'n'; }
+        when( $_ > $TILELEN * 2/3 ) { $ry = 's'; }
+        default { $ry = ''; }
+    }
+    my $region = ($ry . $rx) || 'c';
 
-    # - summary label
-    $ips->{$ip}{label} = $w->{f_ips}->Label(
-        -text    => _ip_to_label($ip,$bef),
-        -justify => 'left',
-        -anchor  => 'w',
-        -bg      => $ips->{$ip}{bgcolor},
-    )->pack(-fill=>'x', -expand=>1);
-
-    # - old positions
-    $ips->{$ip}{oldpos} = [];
-
-=cut
-
+    return wantarray ? ($row, $col, $region) : "$row-$col-$region";
 }
 
 
