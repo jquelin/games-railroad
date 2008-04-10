@@ -12,6 +12,7 @@ use strict;
 use warnings;
 use 5.010;
 
+use Games::RailRoad::Rail;
 use Readonly;
 use Tk; # should come before POE
 use Tk::Dialog;
@@ -453,14 +454,26 @@ sub _on_b_restart {
 }
 
 sub _on_c_b1_motion {
-    print "motion\n";
+    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+    my ($row, $col, $region) = _resolve_coords($x,$y);
+    print "$row / $col / $region\n";
+
+    my $curid = "$row,$col";
+    $h->{current} = $curid;
+    $h->{rails}{$curid} //= Games::RailRoad::Rail->new(row=>$row,col=>$col);
+    $h->{rails}{$curid}->connect($region);
 }
 
 sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my $r = _resolve_coords($x,$y);
-    print "press ($r)\n";
+    my ($row, $col, $region) = _resolve_coords($x,$y);
+
+    my $curid = "$row,$col";
+    $h->{current} = $curid;
+    $h->{rails}{$curid} //= Games::RailRoad::Rail->new(row=>$row,col=>$col);
+    $h->{rails}{$curid}->connect($region);
 }
 
 sub _on_c_b1_release {
