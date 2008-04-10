@@ -16,8 +16,7 @@ use base qw{ Class::Accessor::Fast };
 __PACKAGE__->mk_accessors( qw{ col row _exit } );
 
 
-#--
-# constructor
+# -- CONSTRUCTOR
 
 #
 # my $id = Games::RailRoad->new(%opts);
@@ -52,6 +51,21 @@ sub new {
 
     bless $self, $pkg;
     return $self;
+}
+
+
+# -- PUBLIC METHODS
+
+#
+# $rail->connect( $origin, $end );
+#
+# connect $end as the exit when coming from $origin. note that when $end
+# is undef, this just means that there is currently no exit associated
+# to $exit.
+#
+sub connect {
+    my ($self, $origin, $end) = @_;
+    $self->_exit->{$origin} = $end;
 }
 
 
@@ -95,6 +109,14 @@ the row of the canvas where the rail is.
 
 =head1 PUBLIC METHODS
 
+=head2 $rail->connect( $origin, $end );
+
+Connect C<$end> as the exit when coming from C<$origin>. Note that when
+C<$end> is undef, this just means that there is currently no exit
+associated to C<$exit>.
+
+C<$origin> and C<$end> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>,
+C<sw>, C<s>, C<se>.
 
 
 
