@@ -59,9 +59,9 @@ sub spawn {
             _b_restart     => \&_on_b_restart,
             _tm_click      => \&_on_tm_click,
             #
-            _b1_motion     => \&_on_b1_motion,
-            _b1_press      => \&_on_b1_press,
-            _b1_release    => \&_on_b1_release,
+            _c_b1_motion     => \&_on_c_b1_motion,
+            _c_b1_press      => \&_on_c_b1_press,
+            _c_b1_release    => \&_on_c_b1_release,
         },
         args => \%opts,
     );
@@ -263,9 +263,9 @@ sub _on_start {
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
-    $c->CanvasBind( '<ButtonPress-1>',    [$s->postback('_b1_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B1-ButtonRelease>', [$s->postback('_b1_release'),Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B1-Motion>',        [$s->postback('_b1_motion'), Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-1>',    [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B1-ButtonRelease>', [$s->postback('_c_b1_release'),Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B1-Motion>',        [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $h->{w}{c} = $c;
 }
 
@@ -451,18 +451,18 @@ sub _on_b_restart {
     $k->yield('_open_file', $h->{file});
 }
 
-sub _on_b1_motion {
+sub _on_c_b1_motion {
     print "motion\n";
 }
 
-sub _on_b1_press {
+sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
     my $r = _resolve_coords($x,$y);
     print "press ($r)\n";
 }
 
-sub _on_b1_release {
+sub _on_c_b1_release {
     print "release\n";
 }
 
