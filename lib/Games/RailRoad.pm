@@ -161,9 +161,6 @@ sub _do_open_file {
 sub _on_start {
     my ($k, $h, $s, $opts) = @_[ KERNEL, HEAP, SESSION, ARG0 ];
 
-    #-- load befunge file
-    #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
-
     #-- create gui
 
     # prettyfying tk app.
@@ -267,6 +264,10 @@ sub _on_start {
     $c->CanvasBind( '<B1-ButtonRelease>', [$s->postback('_c_b1_release'),Ev('x'), Ev('y')] );
     $c->CanvasBind( '<B1-Motion>',        [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $h->{w}{c} = $c;
+
+    # -- various heap initializations
+    $h->{rails} = {};
+    #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
 }
 
 
