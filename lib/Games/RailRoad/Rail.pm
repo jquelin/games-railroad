@@ -40,12 +40,13 @@ __PACKAGE__->mk_accessors( qw{ col row _exit } );
 sub new {
     my ($pkg, %opts) = @_;
 
-    croak "missing parameter 'col'" unless defined $opts->{col};
-    croak "missing parameter 'row'" unless defined $opts->{row};
+    croak "missing parameter 'row'" unless defined $opts{row};
+    croak "missing parameter 'col'" unless defined $opts{col};
+    print "new: $opts{row},$opts{col}\n";
 
     my $self = {
-        col   => $opts->{col},
-        row   => $opts->{row},
+        row   => $opts{row},
+        col   => $opts{col},
         _exit => {},
     };
 
@@ -54,6 +55,7 @@ sub new {
 }
 
 
+1;
 __END__
 
 
