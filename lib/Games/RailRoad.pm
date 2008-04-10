@@ -62,7 +62,6 @@ sub spawn {
             #
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
-            _c_b1_release    => \&_on_c_b1_release,
         },
         args => \%opts,
     );
@@ -261,9 +260,8 @@ sub _on_start {
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
-    $c->CanvasBind( '<ButtonPress-1>',    [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B1-ButtonRelease>', [$s->postback('_c_b1_release'),Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B1-Motion>',        [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $h->{w}{c} = $c;
 
     # -- various heap initializations
@@ -457,12 +455,19 @@ sub _on_c_b1_motion {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
     my ($row, $col, $region) = _resolve_coords($x,$y);
-    print "$row / $col / $region\n";
 
-    my $curid = "$row,$col";
-    $h->{current} = $curid;
-    $h->{rails}{$curid} //= Games::RailRoad::Rail->new(row=>$row,col=>$col);
-    $h->{rails}{$curid}->connect($region);
+    # check if we moved somehow.
+    my $curtile  = "$row-$col";
+    my $curpos   = "$row-$col-$region";
+    return if $h->{curpos} eq $curpos;
+    $h->{curpos} = $curpos;
+
+    # create a new rail object if needed.
+    $h->{rails}{$curtile} //= Games::RailRoad::Rail->new({row=>$row,col=>$col});
+
+    # extend rail under the mouse if possible.
+    $h->{rails}{$curtile}->extend_to($region)
+        and $k->yield( '_redraw_tile', $x, $y );
 }
 
 sub _on_c_b1_press {
@@ -470,15 +475,21 @@ sub _on_c_b1_press {
     my (undef, $x, $y) = @$args;
     my ($row, $col, $region) = _resolve_coords($x,$y);
 
-    my $curid = "$row,$col";
-    $h->{current} = $curid;
-    $h->{rails}{$curid} //= Games::RailRoad::Rail->new(row=>$row,col=>$col);
-    $h->{rails}{$curid}->connect($region);
+    # save current position.
+    my $curtile  = "$row-$col";
+    my $curpos   = "$row-$col-$region";
+    $h->{curpos} = $curpos;
+
+    # create a new rail object if needed.
+    $h->{rails}{$curtile} //= Games::RailRoad::Rail->new({row=>$row,col=>$col});
+
+    return if $region eq 'c'; # center is not precise enough
+
+    # extend rail under the mouse if possible.
+    $h->{rails}{$curtile}->extend_to($region)
+        and $k->yield( '_redraw_tile', $x, $y );
 }
 
-sub _on_c_b1_release {
-    print "release\n";
-}
 
 #
 # _tm_click();
