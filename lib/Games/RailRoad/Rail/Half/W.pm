@@ -16,7 +16,7 @@ use base qw{ Games::RailRoad::Rail::Half };
 
 # -- METHODS
 
-sub transform_map {
+sub _transform_map {
     my $prefix = 'Games::RailRoad::Rail::';
     return {
         'e'  => $prefix . 'Straight::E_W',

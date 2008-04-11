@@ -16,7 +16,7 @@ use base qw{ Games::RailRoad::Rail::Cross };
 
 # -- METHODS
 
-sub transform_map {
+sub _transform_map {
     return {};
 }
 

@@ -29,7 +29,7 @@ sub extend_to {
     my ($self, $dir) = @_;
 
     # check if the rail can be extended in the wanted $dir.
-    my $map = $self->transform_map;
+    my $map = $self->_transform_map;
     return unless exists $map->{$dir};
 
     # rebless the object in its new class.
@@ -45,7 +45,7 @@ sub extend_to {
 # extended, and the values are the new class of the rail after being
 # extended.
 #
-sub transform_map {
+sub _transform_map {
     my $prefix = 'Games::RailRoad::Rail::';
     return {
         'e'  => $prefix . 'Half::E',
@@ -143,14 +143,6 @@ possible. In practice, note that the object will change of base class.
 C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
 C<se>. Of course, other values are accepted but won't result in a rail
 extension.
-
-
-
-=head2 my $map = $rail->transform_map;
-
-Return a hashref, which keys are the directions where the rail can be
-extended, and the values are the new class of the rail after being
-extended.
 
 
 
