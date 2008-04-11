@@ -25,7 +25,7 @@ our $VERSION = '0.01';
 
 Readonly my $NBROWS  => 30;
 Readonly my $NBCOLS  => 40;
-Readonly my $TILELEN => 20; # in pixels
+Readonly my $TILELEN => 30; # in pixels
 
 #Readonly my @COLORS => ( [255,0,0], [0,0,255], [0,255,0], [255,255,0], [255,0,255], [0,255,255] );
 
