@@ -10,6 +10,7 @@ package Games::RailRoad::Rail;
 
 use strict;
 use warnings;
+use 5.010;
 
 use UNIVERSAL::require;
 
@@ -18,6 +19,20 @@ __PACKAGE__->mk_accessors( qw{ col row } );
 
 
 # -- PUBLIC METHODS
+
+sub draw {
+    my ($self, $canvas, $tilelen) = @_;
+    my $row = $self->row;
+    my $col = $self->col;
+    $canvas->delete("$row-$col");
+
+    my $class = ref $self;
+    $class =~ s/^.*:://;
+    return if $class eq 'Rail'; # naked rail
+    $self->_draw_segment(lc($_), $canvas, $tilelen)
+        foreach split /_/, $class;
+}
+
 
 #
 # $rail->extend_to( $dir );
@@ -38,8 +53,48 @@ sub extend_to {
 }
 
 
+# -- PRIVATE METHODS
+
 #
-# my $map = $rail->transform_map;
+# $rail->_draw_segment( $segment, $canvas, $tilelen )
+#
+# draw $segment of $rail (at the correct row / col) on $canvas, assuming
+# a square length of $tilelen. $segment can be one of nw, n, ne, w, e,
+# sw, s, se.
+#
+sub _draw_segment {
+    my ($self, $segment, $canvas, $tilelen) = @_;
+
+    my $row = $self->row;
+    my $col = $self->col;
+
+    # compute the end of the segment.
+    my ($endx, $endy);
+    given ($segment) {
+        when('nw') { $endx = 0;          $endy = 0;          }
+        when('n' ) { $endx = $tilelen/2; $endy = 0;          }
+        when('ne') { $endx = $tilelen;   $endy = 0;          }
+        when('w' ) { $endx = 0;          $endy = $tilelen/2; }
+        when('e' ) { $endx = $tilelen;   $endy = $tilelen/2; }
+        when('sw') { $endx = 0;          $endy = $tilelen;   }
+        when('s' ) { $endx = $tilelen/2; $endy = $tilelen;   }
+        when('se') { $endx = $tilelen;   $endy = $tilelen;   }
+    }
+
+    # create the line.
+    $canvas->createLine(
+        $col * $tilelen + $tilelen / 2,
+        $row * $tilelen + $tilelen / 2,
+        $col * $tilelen + $endx,
+        $row * $tilelen + $endy,
+        -tags => [ "$row-$col" ],
+    );
+
+}
+
+
+#
+# my $map = $rail->_transform_map;
 #
 # return a hashref, which keys are the directions where the rail can be
 # extended, and the values are the new class of the rail after being
@@ -58,7 +113,6 @@ sub _transform_map {
         'w'  => $prefix . 'Half::W',
     };
 }
-
 
 
 
@@ -134,6 +188,13 @@ the row of the canvas where the rail is.
 
 
 =head1 PUBLIC METHODS
+
+=head2 $rail->draw( $canvas, $tilelen );
+
+Request C<$rail> to draw itself on C<$canvas>, assuming that each square
+has a length of C<$tilelen>.
+
+
 
 =head2 $rail->extend_to( $dir );
 
