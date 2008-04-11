@@ -218,16 +218,17 @@ sub _on_c_b1_motion {
     return unless defined $newpos;
 
     # check if we moved somehow.
-    return if $h->{curpos} eq $newpos;
+    my $oldpos = $h->{curpos};
+    return if defined($oldpos) && $oldpos eq $newpos;
 
     # check if old position was defined.
-    if ( defined $h->{curpos} ) {
-        my ($oldrow, $oldcol) = split /,/, $h->{curpos};
+    if ( defined $oldpos ) {
+        my ($oldrow, $oldcol) = split /,/, $oldpos;
 
         if ( abs( $newrow - $oldrow ) < 2 &&
              abs( $newcol - $oldcol ) < 2 ) {
             # add the new rail.
-            $h->{graph}->add_edge( $h->{curpos}, $newpos );
+            $h->{graph}->add_edge( $oldpos, $newpos );
             $h->{w}{canvas}->createLine(
                 $oldcol * $TILELEN,
                 $oldrow * $TILELEN,
