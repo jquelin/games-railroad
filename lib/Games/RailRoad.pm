@@ -47,7 +47,6 @@ sub spawn {
             _start           => \&_on_start,
             # public events
             # private events
-            _redraw_tile     => \&_on_redraw_tile,
             # gui events
             _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
@@ -63,17 +62,6 @@ sub spawn {
 
 
 # -- PRIVATE EVENTS
-
-#
-# _on_redraw_tile( $row, $col );
-#
-# request for a tile to be redrawn.
-#
-sub _on_redraw_tile {
-    my ($h, $row, $col) = @_[ HEAP, ARG0 .. $#_ ];
-    $h->{rails}{"$row-$col"}->draw( $h->{w}{canvas}, $TILELEN );
-}
-
 
 #
 # _on_start( \%opts );
