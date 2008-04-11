@@ -51,6 +51,7 @@ sub spawn {
             _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
+            _c_b3_press      => \&_on_c_b3_press,
         },
         args => \%opts,
     );
@@ -170,8 +171,9 @@ sub _on_start {
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
-    $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
     $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-3>', [$s->postback('_c_b3_press'),  Ev('x'), Ev('y')] );
     $h->{w}{canvas} = $c;
 
     # -- various heap initializations
@@ -222,6 +224,7 @@ sub _on_c_b1_motion {
                 $oldrow * $TILELEN,
                 $newcol * $TILELEN,
                 $newrow * $TILELEN,
+                -tags => [ "$oldpos-$newpos" ],
             );
         }
     }
@@ -245,6 +248,28 @@ sub _on_c_b1_press {
 
     # store current position - even undef.
     $h->{curpos} = $pos;
+}
+
+
+#
+# _on_c_b3_press( [], [$stuff, $x, $y] );
+#
+# called when the right-button mouse is pressed on canvas.
+#
+sub _on_c_b3_press {
+    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+    my $canvas = $h->{w}{canvas};
+
+    my $d = $TILELEN / 5;
+    my $items = $canvas->find('overlapping', $x-$d, $y-$d, $x+$d, $y+$d);
+
+    foreach my $id ( @$items ) {
+        my ($tag) = $canvas->gettags($id);
+        my ($n1, $n2) = split /-/, $tag;
+        $h->{graph}->delete_edge($n1, $n2);
+    }
+    $canvas->delete(@$items);
 }
 
 
