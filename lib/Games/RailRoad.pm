@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Games::RailRoad::Rail;
+use Graph;
 use Readonly;
 use Tk; # should come before POE
 use Tk::Dialog;
@@ -187,7 +187,7 @@ sub _on_start {
     $h->{w}{canvas} = $c;
 
     # -- various heap initializations
-    $h->{rails} = {};
+    $h->{graph} = Graph->new( undirected => 1 );
     #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
 }
 
@@ -212,20 +212,33 @@ sub _on_b_quit {
 sub _on_c_b1_motion {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my ($row, $col, $region) = _resolve_coords($x,$y);
+
+    # resolve row & column.
+    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y);
+    return unless defined $newpos;
 
     # check if we moved somehow.
-    my $curtile  = "$row-$col";
-    my $curpos   = "$row-$col-$region";
-    return if $h->{curpos} eq $curpos;
-    $h->{curpos} = $curpos;
+    return if $h->{curpos} eq $newpos;
 
-    # create a new rail object if needed.
-    $h->{rails}{$curtile} //= Games::RailRoad::Rail->new({row=>$row,col=>$col});
+    # check if old position was defined.
+    if ( defined $h->{curpos} ) {
+        my ($oldrow, $oldcol) = split /,/, $h->{curpos};
 
-    # extend rail under the mouse if possible.
-    $h->{rails}{$curtile}->extend_to($region)
-        and $k->yield( '_redraw_tile', $row, $col );
+        if ( abs( $newrow - $oldrow ) < 2 &&
+             abs( $newcol - $oldcol ) < 2 ) {
+            # add the new rail.
+            $h->{graph}->add_edge( $h->{curpos}, $newpos );
+            $h->{w}{canvas}->createLine(
+                $oldcol * $TILELEN,
+                $oldrow * $TILELEN,
+                $newcol * $TILELEN,
+                $newrow * $TILELEN,
+            );
+        }
+    }
+
+    # store current position.
+    $h->{curpos} = $newpos;
 }
 
 
@@ -237,69 +250,49 @@ sub _on_c_b1_motion {
 sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my ($row, $col, $region) = _resolve_coords($x,$y);
 
-    # save current position.
-    my $curtile  = "$row-$col";
-    my $curpos   = "$row-$col-$region";
-    $h->{curpos} = $curpos;
+    # resolve row & column.
+    my ($pos, $row, $col) = _resolve_coords($x,$y);
 
-    # create a new rail object if needed.
-    $h->{rails}{$curtile} //= Games::RailRoad::Rail->new({row=>$row,col=>$col});
-
-    return if $region eq 'c'; # center is not precise enough
-
-    # extend rail under the mouse if possible.
-    $h->{rails}{$curtile}->extend_to($region)
-        and $k->yield( '_redraw_tile', $row, $col );
+    # store current position - even undef.
+    $h->{curpos} = $pos;
 }
 
 
 # -- PRIVATE SUBS
 
 #
-# my ($row, $col, $region) = _resolve_coords($x,$y);
-# my $coords = _resolve_coords($x,$y);
+# my ($pos, $row, $col) = _resolve_coords($x,$y);
 #
 # the canvas deals with pixels: this sub transforms canvas coordinates
-# ($x,$y) in the $row and $col of the matching tile. it will also return
-# the region of the tile:
-#   - nw: north-west
-#   - n:  norh
-#   - ne: north-east
-#   - w:  west
-#   - c:  center
-#   - e:  east
-#   - sw: south-west
-#   - s:  south
-#   - se: south-east
+# ($x,$y) in the $row and $col of the matching node.
 #
-# in scalar context, return the string "$row-$col-$region".
+# $pos is the string "$row-$col".
+#
+# if we're not close enough of a node, precision is not enough: $pos
+# will be undef.
 #
 sub _resolve_coords {
     my ($x,$y) = @_;
 
-    # easy stuff
     my $col = int( $x/$TILELEN );
     my $row = int( $y/$TILELEN );
 
-    # more complex: the region
-    $x -= $col * $TILELEN;
-    $y -= $row * $TILELEN;
-    my ($rx,$ry);
+    # if we're in the middle of two nodes, it's not precise enough.
+    $x %= $TILELEN;
+    $y %= $TILELEN;
     given ($x) {
-        when( $_ < $TILELEN / 3 )   { $rx = 'w'; }
-        when( $_ > $TILELEN * 2/3 ) { $rx = 'e'; }
-        default { $rx = ''; }
+        when( $_ > $TILELEN * 2/3 ) { $col++; }
+        when( $_ < $TILELEN / 3 )   { } # nothing to do
+        default { return; }             # not precise enough
     }
     given ($y) {
-        when( $_ < $TILELEN / 3 )   { $ry = 'n'; }
-        when( $_ > $TILELEN * 2/3 ) { $ry = 's'; }
-        default { $ry = ''; }
+        when( $_ > $TILELEN * 2/3 ) { $row++; }
+        when( $_ < $TILELEN / 3 )   { } # nothing to do
+        default { return; }             # not precise enough
     }
-    my $region = ($ry . $rx) || 'c';
 
-    return wantarray ? ($row, $col, $region) : "$row-$col-$region";
+    return ("$row,$col", $row, $col);
 }
 
 
