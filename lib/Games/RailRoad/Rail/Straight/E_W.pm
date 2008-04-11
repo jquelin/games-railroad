@@ -14,7 +14,6 @@ use warnings;
 use base qw{ Games::RailRoad::Rail::Straight };
 
 
-# -- METHODS
 
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Rail::';
@@ -53,7 +52,6 @@ C<Games::RailRoad::Rail>:
 
 =item * new
 
-=item * transform_map
 
 =back
 

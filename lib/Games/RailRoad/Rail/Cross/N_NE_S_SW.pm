@@ -14,7 +14,6 @@ use warnings;
 use base qw{ Games::RailRoad::Rail::Cross };
 
 
-# -- METHODS
 
 sub _transform_map {
     return {};
@@ -27,7 +26,7 @@ __END__
 
 =head1 NAME
 
-Games::RailRoad::Rail::Straight::N_NE_S_SW - a rail object
+Games::RailRoad::Rail::Cross::N_NE_S_SW - a rail object
 
 
 
@@ -47,7 +46,6 @@ C<Games::RailRoad::Rail>:
 
 =item * new
 
-=item * transform_map
 
 =back
 

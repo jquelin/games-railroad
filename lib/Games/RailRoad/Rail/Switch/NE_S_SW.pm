@@ -6,15 +6,14 @@
 # it under the same terms as Perl itself.
 #
 
-package Games::RailRoad::Rail::Straight::NE_S_SW;
+package Games::RailRoad::Rail::Switch::NE_S_SW;
 
 use strict;
 use warnings;
 
-use base qw{ Games::RailRoad::Rail::Straight };
+use base qw{ Games::RailRoad::Rail::Switch };
 
 
-# -- METHODS
 
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Rail::';
@@ -30,7 +29,7 @@ __END__
 
 =head1 NAME
 
-Games::RailRoad::Rail::Straight::NE_S_SW - a rail object
+Games::RailRoad::Rail::Switch::NE_S_SW - a rail object
 
 
 
@@ -50,7 +49,6 @@ C<Games::RailRoad::Rail>:
 
 =item * new
 
-=item * transform_map
 
 =back
 
