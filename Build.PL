@@ -25,7 +25,7 @@ my $builder = Module::Build->new
         'Test::More'        => 0,
         'Tk'                => 0,
         'Tk::ToolBar'       => 0,
-        'perl'              => '5.008',
+        'perl'              => '5.010',
     },
     requires          => {
         'Getopt::Euclid'    => 0,
@@ -34,7 +34,7 @@ my $builder = Module::Build->new
         'Readonly'          => 0,
         'Tk'                => 0,
         'Tk::ToolBar'       => 0,
-        'perl'              => '5.008',
+        'perl'              => '5.010',
     },
     recommends     => {
         'Test::Pod'           => 0,

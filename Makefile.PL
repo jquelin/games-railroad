@@ -8,7 +8,7 @@
 #
 #
 
-BEGIN { require 5.008; }
+BEGIN { require 5.010; }
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -19,7 +19,7 @@ WriteMakefile(
     LICENSE             => 'perl',
     VERSION_FROM        => 'lib/Games/RailRoad.pm',
     ABSTRACT_FROM       => 'lib/Games/RailRoad.pm',
-    EXE_FILES           => [ 'bin/jqbefdb' ],
+    EXE_FILES           => [ 'bin/railsim' ],
     PREREQ_PM => {
         'Getopt::Euclid'    => 0,
         'List::MoreUtils'   => 0,
