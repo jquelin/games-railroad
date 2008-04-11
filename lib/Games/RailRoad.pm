@@ -52,6 +52,7 @@ sub spawn {
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
             _c_b3_press      => \&_on_c_b3_press,
+            _c_b3_release    => \&_on_c_b3_release,
         },
         args => \%opts,
     );
@@ -173,7 +174,8 @@ sub _on_start {
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<ButtonPress-3>', [$s->postback('_c_b3_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-3>',   [$s->postback('_c_b3_press'),    Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonRelease-3>', [$s->postback('_c_b3_release'),  Ev('x'), Ev('y')] );
     $h->{w}{canvas} = $c;
 
     # -- various heap initializations
@@ -257,19 +259,33 @@ sub _on_c_b1_press {
 # called when the right-button mouse is pressed on canvas.
 #
 sub _on_c_b3_press {
+    my ($h, $args) = @_[HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+    $h->{delpos} = [$x,$y];
+}
+
+
+#
+# _on_c_b3_release( [], [$stuff, $x, $y] );
+#
+# called when the right-button mouse is pressed on canvas.
+#
+sub _on_c_b3_release {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
     my $canvas = $h->{w}{canvas};
 
-    my $d = $TILELEN / 5;
-    my $items = $canvas->find('overlapping', $x-$d, $y-$d, $x+$d, $y+$d);
+    # find tags of elems selected.
+    my $items = $canvas->find('overlapping', $x, $y, @{ $h->{delpos} });
+    my %tags;
+    $tags{$_}++ for map { ($canvas->gettags($_))[0] } @$items;
 
-    foreach my $id ( @$items ) {
-        my ($tag) = $canvas->gettags($id);
+    # delete the items
+    foreach my $tag ( keys %tags ) {
         my ($n1, $n2) = split /-/, $tag;
         $h->{graph}->delete_edge($n1, $n2);
+        $canvas->delete($tag);
     }
-    $canvas->delete(@$items);
 }
 
 
