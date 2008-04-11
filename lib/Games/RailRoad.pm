@@ -44,12 +44,15 @@ sub spawn {
 
     my $session = POE::Session->create(
         inline_states => {
+            # special poe events
             _start         => \&_on_start,
             # public events
             breakpoint_remove => \&_do_breakpoint_remove,
             # private events
             _breakpoint_add => \&_do_breakpoint_add,
             _open_file      => \&_do_open_file,
+            #
+            _redraw_tile    => \&_on_redraw_tile,
             # gui events
             _b_breakpoints => \&_on_b_breakpoints,
             _b_continue    => \&_on_b_continue,
@@ -150,6 +153,12 @@ sub _do_open_file {
     $tm->configure(-command => sub { _get_cell_value($h->{bef}->get_torus,@_[1,2]) });
     $tm->tagCell("decay-$id-0", '0,0');
     _gui_set_pause($h);
+}
+
+
+sub _on_redraw_tile {
+    my ($h, $row, $col) = @_[ HEAP, ARG0 .. $#_ ];
+    $h->{rails}{"$row-$col"}->draw( $h->{w}{canvas}, $TILELEN );
 }
 
 
@@ -467,7 +476,7 @@ sub _on_c_b1_motion {
 
     # extend rail under the mouse if possible.
     $h->{rails}{$curtile}->extend_to($region)
-        and $k->yield( '_redraw_tile', $x, $y );
+        and $k->yield( '_redraw_tile', $row, $col );
 }
 
 sub _on_c_b1_press {
@@ -487,7 +496,7 @@ sub _on_c_b1_press {
 
     # extend rail under the mouse if possible.
     $h->{rails}{$curtile}->extend_to($region)
-        and $k->yield( '_redraw_tile', $x, $y );
+        and $k->yield( '_redraw_tile', $row, $col );
 }
 
 
