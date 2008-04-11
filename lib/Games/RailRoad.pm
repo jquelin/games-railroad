@@ -262,7 +262,7 @@ sub _on_start {
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
     $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
-    $h->{w}{c} = $c;
+    $h->{w}{canvas} = $c;
 
     # -- various heap initializations
     $h->{rails} = {};
