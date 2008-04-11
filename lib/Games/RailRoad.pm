@@ -51,6 +51,7 @@ sub spawn {
             _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
+            _c_b3_motion     => \&_on_c_b3_motion,
             _c_b3_press      => \&_on_c_b3_press,
             _c_b3_release    => \&_on_c_b3_release,
         },
@@ -174,6 +175,7 @@ sub _on_start {
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B3-Motion>',       [$s->postback('_c_b3_motion'), Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonPress-3>',   [$s->postback('_c_b3_press'),    Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonRelease-3>', [$s->postback('_c_b3_release'),  Ev('x'), Ev('y')] );
     $h->{w}{canvas} = $c;
@@ -254,9 +256,27 @@ sub _on_c_b1_press {
 
 
 #
+# _on_c_b3_motion( [], [$stuff, $x, $y] );
+#
+# called when the mouse is moving on canvas while right button is down.
+# this will update the delete area.
+#
+sub _on_c_b3_motion {
+    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+
+    my $canvas = $h->{w}{canvas};
+    my $tag = 'delete-area';
+    $canvas->delete($tag);
+    $canvas->createRectangle( $x, $y, @{ $h->{delpos} }, -dash=>'.', -tags=>[$tag] );
+}
+
+
+#
 # _on_c_b3_press( [], [$stuff, $x, $y] );
 #
-# called when the right-button mouse is pressed on canvas.
+# called when the right-button mouse is pressed on canvas. this will
+# mark the beginning corner of the delete area.
 #
 sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
@@ -268,7 +288,8 @@ sub _on_c_b3_press {
 #
 # _on_c_b3_release( [], [$stuff, $x, $y] );
 #
-# called when the right-button mouse is pressed on canvas.
+# called when the right-button mouse is released on canvas.  this will
+# actually delete what's enclosed in the delete area.
 #
 sub _on_c_b3_release {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
@@ -276,16 +297,19 @@ sub _on_c_b3_release {
     my $canvas = $h->{w}{canvas};
 
     # find tags of elems selected.
-    my $items = $canvas->find('overlapping', $x, $y, @{ $h->{delpos} });
+    my $items = $canvas->find('enclosed', $x, $y, @{ $h->{delpos} });
     my %tags;
     $tags{$_}++ for map { ($canvas->gettags($_))[0] } @$items;
 
-    # delete the items
+    # delete the items.
     foreach my $tag ( keys %tags ) {
         my ($n1, $n2) = split /-/, $tag;
         $h->{graph}->delete_edge($n1, $n2);
         $canvas->delete($tag);
     }
+
+    # delete the delete rectangle.
+    $canvas->delete('delete-area');
 }
 
 
