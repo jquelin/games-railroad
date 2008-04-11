@@ -23,15 +23,14 @@ use POE;
 
 our $VERSION = '0.01';
 
-Readonly my $NBROWS  => 30;
-Readonly my $NBCOLS  => 40;
-Readonly my $TILELEN => 30; # in pixels
+Readonly my $NBROWS  => 40;
+Readonly my $NBCOLS  => 60;
+Readonly my $TILELEN => 20; # in pixels
 
 #Readonly my @COLORS => ( [255,0,0], [0,0,255], [0,255,0], [255,255,0], [255,0,255], [0,255,255] );
 
 
-#--
-# constructor
+# -- CONSTRUCTOR
 
 #
 # my $id = Games::RailRoad->spawn(%opts);
@@ -45,24 +44,12 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # special poe events
-            _start         => \&_on_start,
+            _start           => \&_on_start,
             # public events
-            breakpoint_remove => \&_do_breakpoint_remove,
             # private events
-            _breakpoint_add => \&_do_breakpoint_add,
-            _open_file      => \&_do_open_file,
-            #
-            _redraw_tile    => \&_on_redraw_tile,
+            _redraw_tile     => \&_on_redraw_tile,
             # gui events
-            _b_breakpoints => \&_on_b_breakpoints,
-            _b_continue    => \&_on_b_continue,
-            _b_next        => \&_on_b_next,
-            _b_open        => \&_on_b_open,
-            _b_pause       => \&_on_b_pause,
-            _b_quit        => \&_on_b_quit,
-            _b_restart     => \&_on_b_restart,
-            _tm_click      => \&_on_tm_click,
-            #
+            _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
         },
@@ -72,90 +59,16 @@ sub spawn {
 }
 
 
-#--
-# public events
+# -- PUBLIC EVENTS
+
+
+# -- PRIVATE EVENTS
 
 #
-# breakpoint_remove( $brkpt );
+# _on_redraw_tile( $row, $col );
 #
-# remove $brkpt from the list of active breakpoints.
+# request for a tile to be redrawn.
 #
-sub _do_breakpoint_remove {
-    my ($k, $h, $brkpt) = @_[KERNEL, HEAP, ARG0];
-    my ($type, $value) = split /: /, $brkpt;
-    delete $h->{breakpoints}{$type}{$value}; # remove breakpoint
-}
-
-
-#--
-# private events
-
-#
-# breakpoint_add( $brkpt );
-#
-# add $brkpt to the list of active breakpoints. request LDB::Breakpoints
-# window to add it to its list.
-#
-sub _do_breakpoint_add {
-    my ($k, $h, $args) = @_[KERNEL, HEAP, ARG0];
-    my $brkpt = $args->[0];
-
-    # store new breakpoint.
-    my ($type, $value) = split /: /, $brkpt;
-    $h->{breakpoints}{$type}{$value} = 1;
-
-    # notify breakpoints window.
-    if ( not exists $h->{w}{breakpoints} ) {
-        my $id = Games::RailRoad::Breakpoints->spawn(
-            parent     => $poe_main_window,
-            breakpoint => $brkpt,
-        );
-        $h->{w}{breakpoints} = $id;
-    } else {
-        $k->post( $h->{w}{breakpoints}, 'breakpoint_add', $brkpt );
-    }
-}
-
-
-#
-# _open_file( $file );
-#
-# force reloading of $file, with everything that it implies - ie,
-# reinitializes debugger state.
-#
-sub _do_open_file {
-    my ($h, $file) = @_[HEAP, ARG0];
-
-    # store filename
-    $h->{file} = $file;
-
-    # clean old ips
-    foreach my $ip ( keys %{ $h->{ips} } ) {
-        next unless defined $h->{ips}{$ip}{label};
-        $h->{ips}{$ip}{label}->destroy;
-        delete $h->{ips}{$ip}{label};
-    }
-    my $tm = $h->{w}{tm};
-    $tm->tagDelete($_) for $tm->tagNames('decay-*');
-
-    # load the new file
-    my $bef = $h->{bef} = Language::Befunge->new( $file );
-    my $newip = Language::Befunge::IP->new($bef->get_dimensions);
-    $bef->set_ips( [ $newip ] );
-    $bef->set_retval(0);
-    $h->{ips}      = {};
-    $h->{tick}     = 0;
-    $h->{continue} = 0;
-    _create_ip_struct( $h, $newip );
-    my $id = $newip->get_id;
-
-    # force rescanning of the playfield
-    $tm->configure(-command => sub { _get_cell_value($h->{bef}->get_torus,@_[1,2]) });
-    $tm->tagCell("decay-$id-0", '0,0');
-    _gui_set_pause($h);
-}
-
-
 sub _on_redraw_tile {
     my ($h, $row, $col) = @_[ HEAP, ARG0 .. $#_ ];
     $h->{rails}{"$row-$col"}->draw( $h->{w}{canvas}, $TILELEN );
@@ -279,166 +192,7 @@ sub _on_start {
 }
 
 
-#--
-# gui events
-
-#
-# _b_breakpoints();
-#
-# called when the user wants to show/hide breakpoints.
-#
-sub _on_b_breakpoints {
-    my ($k, $h) = @_[KERNEL, HEAP];
-
-    return $k->post($h->{w}{breakpoints}, 'visibility_toggle')
-        if exists $h->{w}{breakpoints};
-
-    my $id = Games::RailRoad::Breakpoints->spawn(parent=>$poe_main_window);
-    $h->{w}{breakpoints} = $id;
-}
-
-
-#
-# _b_continue();
-#
-# called when the user wants the paused script to be ran.
-#
-sub _on_b_continue {
-    my ($k, $h) = @_[KERNEL, HEAP];
-    $h->{continue} = 1;
-    _gui_set_continue($h);
-    $k->yield('_b_next');
-}
-
-
-#
-# _b_next();
-#
-# called when the user wants to advance the script one step further.
-#
-sub _on_b_next {
-
-=pod
-
-    my ($k,$h) = @_[KERNEL, HEAP];
-
-    my $w   = $h->{w};
-    my $bef = $h->{bef};
-    my $ips = $h->{ips};
-    my $tm  = $h->{w}{tm};
-
-    if ( scalar @{ $bef->get_ips } == 0 ) {
-        # no more ip - end of program
-        return;
-    }
-
-    # get next ip
-    my $ip = shift @{ $bef->get_ips };
-    my $id = $ip->get_id;
-
-    _create_ip_struct($h, $ip) unless exists $ips->{$ip};
-
-    # show color of ip being currently processed
-    $w->{ip}->configure(-bg=>$ips->{$ip}{bgcolor});
-
-    # do some color decay.
-    my $oldpos = $ips->{$ip}{oldpos};
-    unshift @$oldpos, _vec_to_tablematrix_index($ip->get_position);
-    pop     @$oldpos if scalar @$oldpos > $DECAY;
-    foreach my $i ( reverse 0 .. $DECAY-1 ) {
-        next unless exists $oldpos->[$i];
-        $tm->tagCell("decay-$id-$i", $oldpos->[$i]);
-    }
-
-
-
-    # update gui
-
-    # advance next ip
-    $bef->set_curip($ip);
-    $bef->process_ip;
-
-    if ( $ip->get_end ) {
-        # ip should be terminated - remove summary label.
-        $ips->{$ip}{label}->destroy;
-        delete $ips->{$ip}{label};
-    } else {
-        # update gui
-        my $tmindex = _vec_to_tablematrix_index($ip->get_position);
-        $tm->see($tmindex);
-        $tm->tagCell( "decay-$id-0", $tmindex );
-        $ips->{$ip}{label}->configure( -text => _ip_to_label($ip,$bef) );
-    }
-
-
-    # end of tick: no more ips to process
-    if ( scalar @{ $bef->get_ips } == 0 ) {
-        $h->{tick}++;
-        $bef->set_ips( $bef->get_newips );
-        $bef->set_newips( [] );
-
-        # color decay on terminated ips
-        my @ips    = map { $ips->{$_}{object} } keys %$ips;
-        my @oldips = grep { $_->get_end } @ips;
-        foreach my $oldip ( @oldips ) {
-            my $oldid = $oldip->get_id;
-            my $oldpos = $ips->{$oldip}{oldpos};
-            pop @$oldpos;
-            foreach my $i ( 0 .. $DECAY-1 ) {
-                last unless exists $oldpos->[$i];
-                my $decay = $i + $DECAY - scalar(@$oldpos);
-                $tm->tagCell("decay-$oldid-$decay", $oldpos->[$i]);
-            }
-            delete $ips->{$oldip} unless scalar(@$oldpos);
-        }
-    }
-
-    # fire again if user asked for continue.
-    my $vec = $ip->get_position;
-    my ($x, $y) = $vec->get_all_components;
-    my $brkpts = $h->{breakpoints};
-    my $is_breakpoint = exists $brkpts->{row}{$y}
-        || exists $brkpts->{col}{$x}
-        || exists $brkpts->{pos}{"$x,$y"};
-    if ( $is_breakpoint ) {
-        $k->yield('_b_pause');
-    } else {
-        $k->delay_set( '_b_next', $DELAY ) if $h->{continue};
-    }
-
-=cut
-
-}
-
-
-#
-# _b_pause();
-#
-# called when the user wants the running script to be paused.
-#
-sub _on_b_pause {
-    my ($k, $h) = @_[KERNEL, HEAP];
-    $h->{continue} = 0;
-    _gui_set_pause($h);
-}
-
-
-#
-# _b_open();
-#
-# called when the user wants to load another befunge script.
-#
-sub _on_b_open {
-    my @types = (
-       [ 'Befunge scripts', '.bef' ],
-       [ 'All files',       '*'    ]
-    );
-    # i know, this prevent poe from running
-    my $file = $poe_main_window->getOpenFile(-filetypes => \@types);
-    $_[KERNEL]->yield( '_open_file', $file )
-        if defined($file) && $file ne '';
-}
-
+# -- GUI EVENTS
 
 #
 # _b_quit();
@@ -451,15 +205,10 @@ sub _on_b_quit {
 
 
 #
-# _b_restart();
+# _on_c_b1_motion( [], [$stuff, $x, $y] );
 #
-# reload current file.
+# called when the mouse is moving on canvas while button is down.
 #
-sub _on_b_restart {
-    my ($k,$h) = @_[KERNEL, HEAP];
-    $k->yield('_open_file', $h->{file});
-}
-
 sub _on_c_b1_motion {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
@@ -479,6 +228,12 @@ sub _on_c_b1_motion {
         and $k->yield( '_redraw_tile', $row, $col );
 }
 
+
+#
+# _on_c_b1_press( [], [$stuff, $x, $y] );
+#
+# called when the button mouse is pressed on canvas.
+#
 sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
@@ -500,36 +255,7 @@ sub _on_c_b1_press {
 }
 
 
-#
-# _tm_click();
-#
-# called when the user clicks on the field. used to add breakpoints.
-#
-sub _on_tm_click {
-    my ($h, $s, $arg) = @_[HEAP, SESSION, ARG1];
-
-    my ($old, $new) = @$arg;
-    my ($x,$y) = split /,/, $new;
-
-    #my $vec = Language::Befunge::Vector->new(2, $y, $x);
-    #my $val = $h->{bef}->get_torus->get_value($vec);
-    #my $chr = chr $val;
-
-
-    my $menuitems = [ [ Cascade => '~Add breakpoint', -menuitems => [
-        [ Button=>"on ~row $x",      -command=>$s->postback('_breakpoint_add', "row: $x") ],
-        [ Button=>"on ~col $y",      -command=>$s->postback('_breakpoint_add', "col: $y") ],
-        [ Button=>"at ~pos ($y,$x)", -command=>$s->postback('_breakpoint_add', "pos: $y,$x") ],
-    ] ] ];
-
-    my $m = $poe_main_window->Menu( -menuitems => $menuitems );
-    $m->Popup( -popover => 'cursor', -popanchor => 'nw' );
-}
-
-
-#--
-# private subs
-
+# -- PRIVATE SUBS
 
 #
 # my ($row, $col, $region) = _resolve_coords($x,$y);
@@ -549,7 +275,7 @@ sub _on_tm_click {
 #   - se: south-east
 #
 # in scalar context, return the string "$row-$col-$region".
-# 
+#
 sub _resolve_coords {
     my ($x,$y) = @_;
 
@@ -577,91 +303,6 @@ sub _resolve_coords {
 }
 
 
-#
-# my $value = _get_cell_value( $torus, $row, $col );
-#
-# return the $value of $torus at the position ($row, $col). this
-# function is used by Tk::TableMatrix to fill in the values of the
-# cells.
-#
-sub _get_cell_value {
-    my ($torus, $row, $col) = @_;
-    my $v = Language::Befunge::Vector->new(2, $col, $row);
-    return chr( $torus->get_value($v) );
-}
-
-
-#
-# _gui_set_continue( $heap );
-#
-# update the gui to enable/disable the buttons in order to match the
-# state 'running'. it will use the $heap->{w} structure to find the
-# wanted gui elements.
-#
-sub _gui_set_continue {
-    my ($h) = @_;
-    $h->{w}{_b_pause}   ->configure( -state => 'normal'   );
-    $h->{w}{_b_next}    ->configure( -state => 'disabled' );
-    $h->{w}{_b_continue}->configure( -state => 'disabled' );
-    $h->{w}{mnu_run}->entryconfigure( 1, -state => 'normal'   );
-    $h->{w}{mnu_run}->entryconfigure( 2, -state => 'disabled' );
-    $h->{w}{mnu_run}->entryconfigure( 3, -state => 'disabled' );
-}
-
-
-#
-# _gui_set_pause( $heap );
-#
-# update the gui to enable/disable the buttons in order to match the
-# state 'paused'. it will use the $heap->{w} structure to find the
-# wanted gui elements.
-#
-sub _gui_set_pause {
-    my ($h) = @_;
-    $h->{w}{_b_pause}   ->configure( -state => 'disabled' );
-    $h->{w}{_b_next}    ->configure( -state => 'normal'   );
-    $h->{w}{_b_continue}->configure( -state => 'normal'   );
-    $h->{w}{mnu_run}->entryconfigure( 1, -state => 'disabled' );
-    $h->{w}{mnu_run}->entryconfigure( 2, -state => 'normal'   );
-    $h->{w}{mnu_run}->entryconfigure( 3, -state => 'normal'   );
-}
-
-
-#
-# my $str = _ip_to_label( $ip, $bef );
-#
-# return a stringified value of the Language::Befunge::IP to be
-# displayed in the label. it needs the Language::Befunge::Interpreter to
-# fetch some values in the torus.
-#
-# the stringified value will be sthg like:
-#   IP#2 @4,6 0 (ord=48) [ 32 111 52 32 ]
-#
-sub _ip_to_label {
-    my ($ip,$bef) = @_;
-    my $id     = $ip->get_id;
-    my $vec    = $ip->get_position;
-    my ($x,$y) = $vec->get_all_components;
-    my $stack  = $ip->get_toss;
-    my $val    = $bef->get_torus->get_value($vec);
-    my $chr    = chr $val;
-    return "IP#$id \@$x,$y $chr (ord=$val) [@$stack]";
-}
-
-
-#
-# my $str = _vec_to_tablematrix_index( $vector );
-#
-# given a Language::Befunge::Vector object, return its stringified value
-# as Tk::TableMatrix understand it: "x,y".
-#
-sub _vec_to_tablematrix_index {
-    my ($vec) = @_;
-    my ($x, $y) = $vec->get_all_components;
-    return "$y,$x";
-}
-
-
 1;
 
 __END__
@@ -669,22 +310,15 @@ __END__
 
 =head1 NAME
 
-Games::RailRoad - a graphical debugger for Language::Befunge
-
-
-
-=head1 SYNOPSYS
-
-    $ jqbefdb
+Games::RailRoad - a train simulation game
 
 
 
 =head1 DESCRIPTION
 
-Games::RailRoad provides you with a graphical debugger for
-Language::Befunge. This allow to follow graphically your befunge program
-while it gets executed, update the stack and the playfield, add
-breakpoints, etc.
+C<Games::RailRoad> allows you to draw a railroad, create some trains and
+make them move on it. What you did when you were kid, but on your computer
+now.
 
 
 
@@ -692,17 +326,8 @@ breakpoints, etc.
 
 =head2 my $id = Games::RailRoad->spawn( %opts );
 
-Create a graphical debugger, and return the associated POE session ID.
-One can pass the following options:
-
-=over 4
-
-=item file => $file
-
-A befunge program to be loaded for debug purposes.
-
-
-=back
+Create a new game, and return the associated POE session ID.
+No option supported as of now.
 
 
 
@@ -713,9 +338,7 @@ The POE session accepts the following events:
 
 =over 4
 
-=item breakpoint_remove( $brkpt )
-
-Remove a breakpoint from the list of active breakpoints.
+=item none yet.
 
 
 =back
@@ -724,22 +347,17 @@ Remove a breakpoint from the list of active breakpoints.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<< <
-language-befunge-debugger at rt.cpan.org> >>, or through the web
-interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-RailRoad>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+Please report any bugs or feature requests to C<< < games-railroad at
+rt.cpan.org> >>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-RailRoad>.  I
+will be notified, and then you'll automatically be notified of progress
+on your bug as I make changes.
 
 
 
 =head1 SEE ALSO
 
-L<Language::Befunge>, L<POE>, L<Tk>.
-
-
-Development is discussed on E<lt>language-befunge@mongueurs.netE<gt> -
-feel free to join us.
+L<POE>, L<Tk>.
 
 
 You can also look for information on this module at:
