@@ -12,6 +12,7 @@ use strict;
 use warnings;
 use 5.010;
 
+use Games::RailRoad::Train;
 use Graph;
 use Readonly;
 use Tk; # should come before POE
@@ -51,6 +52,7 @@ sub spawn {
             _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
+            _c_b2_press      => \&_on_c_b2_press,
             _c_b3_motion     => \&_on_c_b3_motion,
             _c_b3_press      => \&_on_c_b3_press,
             _c_b3_release    => \&_on_c_b3_release,
@@ -175,13 +177,15 @@ sub _on_start {
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B3-Motion>',       [$s->postback('_c_b3_motion'), Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<ButtonPress-2>', [$s->postback('_c_b2_press'),  Ev('x'), Ev('y')] );
+    $c->CanvasBind( '<B3-Motion>',       [$s->postback('_c_b3_motion'),   Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonPress-3>',   [$s->postback('_c_b3_press'),    Ev('x'), Ev('y')] );
     $c->CanvasBind( '<ButtonRelease-3>', [$s->postback('_c_b3_release'),  Ev('x'), Ev('y')] );
     $h->{w}{canvas} = $c;
 
     # -- various heap initializations
     $h->{graph} = Graph->new( undirected => 1 );
+    $h->{train} = undef;
     #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
 }
 
@@ -252,6 +256,37 @@ sub _on_c_b1_press {
 
     # store current position - even undef.
     $h->{curpos} = $pos;
+}
+
+
+#
+# _on_c_b2_press( [], [$stuff, $x, $y] );
+#
+# called when the right-button mouse is pressed on canvas. this will
+# place a new train.
+#
+sub _on_c_b2_press {
+    my ($h, $args) = @_[HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+    my $graph = $h->{graph};
+
+    return if defined $h->{train}; # only one train
+
+    my ($pos, $row, $col) = _resolve_coords($x,$y,2);
+
+    # check if there's a rail at $pos
+    if ( not $graph->has_vertex($pos) ) {
+        warn "no rail at ($pos)\n";
+        return;
+    }
+
+    my @neighbours = $graph->neighbours($pos);
+    $h->{train} = Games::RailRoad::Train->new( {
+        from => $pos,
+        to   => $neighbours[0],
+        frac => 0,
+    } );
+    $h->{train}->draw($h->{w}{canvas}, $TILELEN);
 }
 
 
