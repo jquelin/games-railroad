@@ -26,7 +26,8 @@ our $VERSION = '0.01';
 
 Readonly my $NBROWS  => 40;
 Readonly my $NBCOLS  => 60;
-Readonly my $TILELEN => 20; # in pixels
+Readonly my $TILELEN => 20;    # in pixels
+Readonly my $TICK    => 0.050; # in seconds
 
 #Readonly my @COLORS => ( [255,0,0], [0,0,255], [0,255,0], [255,255,0], [255,0,255], [0,255,255] );
 
@@ -48,6 +49,7 @@ sub spawn {
             _start           => \&_on_start,
             # public events
             # private events
+            _tick            => \&_on_tick,
             # gui events
             _b_quit          => \&_on_b_quit,
             _c_b1_motion     => \&_on_c_b1_motion,
@@ -187,6 +189,34 @@ sub _on_start {
     $h->{graph} = Graph->new( undirected => 1 );
     $h->{train} = undef;
     #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
+
+    #
+    $k->delay_set( '_tick', $TICK );
+}
+
+
+sub _on_tick {
+    my ($k, $h) = @_[KERNEL, HEAP];
+
+    $k->delay_set( '_tick', $TICK );
+    my $train = $h->{train};
+    return unless defined $train;
+
+    my $frac = $train->frac;
+    $frac += 1/5;
+    if ( $frac >= 1 ) {
+        # eh, changing node.
+        $frac -= 1;
+        my $from = $train->from;
+        my $to   = $train->to;
+
+        my @neighbours = grep { $_ ne $from } $h->{graph}->neighbours($to);
+        $train->from($to);
+        $train->to($neighbours[0]);
+    }
+
+    $train->frac($frac);
+    $train->draw( $h->{w}{canvas}, $TILELEN );
 }
 
 
