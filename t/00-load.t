@@ -11,8 +11,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 2;
+
 require_ok( 'Games::RailRoad' );
 diag( "Testing Games::RailRoad $Games::RailRoad::VERSION Perl $], $^X" );
+
+require_ok( 'Games::RailRoad::Train' );
 
 exit;
