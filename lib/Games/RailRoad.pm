@@ -144,14 +144,14 @@ sub _on_start {
     # toolbar
     my @tb = (
         [ 'Button', 'actexit16',        'quit',        '<Control-q>', '_b_quit' ],
-        [ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
-        [ 'separator' ],
-        [ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
-        [ 'separator' ],
-        [ 'Button', 'playstart16',      'restart',     '<R>',         '_b_restart' ],
-        [ 'Button', 'playpause16',      'pause',       '<p>',         '_b_pause' ],
-        [ 'Button', 'nav1rightarrow16', 'next',        '<n>',         '_b_next' ],
-        [ 'Button', 'nav2rightarrow16', 'continue',    '<c>',         '_b_continue' ],
+        #[ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
+        #[ 'separator' ],
+        #[ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
+        #[ 'separator' ],
+        #[ 'Button', 'playstart16',      'restart',     '<R>',         '_b_restart' ],
+        #[ 'Button', 'playpause16',      'pause',       '<p>',         '_b_pause' ],
+        #[ 'Button', 'nav1rightarrow16', 'next',        '<n>',         '_b_next' ],
+        #[ 'Button', 'nav2rightarrow16', 'continue',    '<c>',         '_b_continue' ],
     );
     my $tb = $poe_main_window->ToolBar(-movable=>0);
     foreach my $item ( @tb ) {
