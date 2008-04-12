@@ -462,6 +462,58 @@ The POE session accepts the following events:
 
 
 
+=head1 TODO
+
+Currently the module is very rough and supports very few operations:
+
+=over 4
+
+=item * drawing and connecting rails by left-clicking and dragging mouse
+on the canvas.
+
+=item * selecting an area to be deleted by right-clicking and dragging
+mouse on the canvas.
+
+=item * placing a train on a rail by middle-clikcing on a rail on the canvas.
+
+=back
+
+
+The amount of work needed is much more vast and includes (but not
+limited to):
+
+=over 4
+
+=item * support for "end-of-road" nodes (without any more edges)
+
+=item * support for more than one train
+
+=item * support for switches on nodes with more than 2 edges
+
+=item * support for "impossible" nodes (no 90-turn, no more than 4
+edges)
+
+=item * prettier drawing of rails
+
+=item * adding coaches to trains
+
+=item * fixing speed change in diagonal rails
+
+=item * saving / loading to a file
+
+=item * rc-file for the application
+
+=item * better interface (what about one-button mice?)
+
+=item * available help
+
+=item * etc...
+
+=back
+
+
+
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<< < games-railroad at
