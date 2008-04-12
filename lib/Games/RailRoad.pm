@@ -208,7 +208,7 @@ sub _on_c_b1_motion {
     my (undef, $x, $y) = @$args;
 
     # resolve row & column.
-    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y);
+    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y,3);
     return unless defined $newpos;
 
     # check if we moved somehow.
@@ -248,7 +248,7 @@ sub _on_c_b1_press {
     my (undef, $x, $y) = @$args;
 
     # resolve row & column.
-    my ($pos, $row, $col) = _resolve_coords($x,$y);
+    my ($pos, $row, $col) = _resolve_coords($x,$y,3);
 
     # store current position - even undef.
     $h->{curpos} = $pos;
@@ -316,18 +316,25 @@ sub _on_c_b3_release {
 # -- PRIVATE SUBS
 
 #
-# my ($pos, $row, $col) = _resolve_coords($x,$y);
+# my ($pos, $row, $col) = _resolve_coords($x, $y, $div);
 #
 # the canvas deals with pixels: this sub transforms canvas coordinates
 # ($x,$y) in the $row and $col of the matching node.
 #
-# $pos is the string "$row-$col".
-#
 # if we're not close enough of a node, precision is not enough: $pos
 # will be undef.
 #
+# $div allows one to set the precision: $TILELEN will be divided by
+# $div, and _rersolve_coords() will return a node only if it's in the
+# first (or last) division. that is, if $div == 2, a node will always be
+# returned. if $div == 3, the middle third will return undef. if $div ==
+# 4, then the half segment will return undef.
+#
+# $pos is the string "$row-$col".
+#
+#
 sub _resolve_coords {
-    my ($x,$y) = @_;
+    my ($x, $y, $div) = @_;
 
     my $col = int( $x/$TILELEN );
     my $row = int( $y/$TILELEN );
@@ -336,14 +343,14 @@ sub _resolve_coords {
     $x %= $TILELEN;
     $y %= $TILELEN;
     given ($x) {
-        when( $_ > $TILELEN * 2/3 ) { $col++; }
-        when( $_ < $TILELEN / 3 )   { } # nothing to do
-        default { return; }             # not precise enough
+        when( $_ > $TILELEN * ($div-1)/$div ) { $col++; }
+        when( $_ < $TILELEN / $div          ) { } # nothing to do
+        default { return; }                       # not precise enough
     }
     given ($y) {
-        when( $_ > $TILELEN * 2/3 ) { $row++; }
-        when( $_ < $TILELEN / 3 )   { } # nothing to do
-        default { return; }             # not precise enough
+        when( $_ > $TILELEN * ($div-1)/$div ) { $row++; }
+        when( $_ < $TILELEN / $div          ) { } # nothing to do
+        default { return; }                       # not precise enough
     }
 
     return ("$row,$col", $row, $col);
