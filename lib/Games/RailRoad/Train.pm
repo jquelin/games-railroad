@@ -48,46 +48,13 @@ __END__
 
 =head1 NAME
 
-Games::RailRoad::Rail - a rail object
+Games::RailRoad::Train - a train object
 
 
 
 =head1 DESCRIPTION
 
-C<Games::RailRoad::Rail> provides a rail object. This is the base class
-for the following classes:
-
-=over 4
-
-=item *
-
-C<Games::RailRoad::Rail::Half> is a rail with only one segment, from the
-center to one of the 8 extremities of a square.
-
-=item *
-
-C<Games::RailRoad::Rail::Straight> is a rail with two segments, linking
-two of the 8 extremities of a square.
-
-=item *
-
-C<Games::RailRoad::Rail::Switch> is a rail with three segments, linking
-three of the 8 extremities of a square through the center. The I<active>
-segment taken by a train riding this rail can switch between two of the
-segments.  switch, 
-
-=item *
-
-C<Games::RailRoad::Rail::Cross> is a rail with four segments: two
-straight lines crossing in the center of the square.
-
-=back
-
-
-Each of those classes also has subclasses, one for each configuration
-allowed. They are named after each of the existing extremity of the
-square linked (in uppercase), sorted and separated by underscore (C<_>).
-For example: C<Games::RailRoad::Rail::Switch::N_S_SE>.
+C<Games::RailRoad::Train> provides a train object.
 
 
 
@@ -98,15 +65,24 @@ For example: C<Games::RailRoad::Rail::Switch::N_S_SE>.
 Create a new rail object. One can pass a hash reference with the
 following keys:
 
+
 =over 4
 
-=item col => $col
 
-the column of the canvas where the rail is.
+=item from => $node
 
-=item row => $row
+the node from where the train is coming.
 
-the row of the canvas where the rail is.
+
+=item to => $node
+
+the node where the train is headed.
+
+
+=item frac => $frac
+
+a number between 0 and 1 indicating where exactly the train is between
+its from and to nodes.
 
 
 =back
@@ -115,21 +91,10 @@ the row of the canvas where the rail is.
 
 =head1 PUBLIC METHODS
 
-=head2 $rail->draw( $canvas, $tilelen );
+=head2 $train->draw( $canvas, $tilelen );
 
-Request C<$rail> to draw itself on C<$canvas>, assuming that each square
+Request C<$train> to draw itself on C<$canvas>, assuming that each square
 has a length of C<$tilelen>.
-
-
-
-=head2 $rail->extend_to( $dir );
-
-Try to extend C<$rail> in the wanted C<$dir>. Return undef if it isn't
-possible. In practice, note that the object will change of base class.
-
-C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
-C<se>. Of course, other values are accepted but won't result in a rail
-extension.
 
 
 
