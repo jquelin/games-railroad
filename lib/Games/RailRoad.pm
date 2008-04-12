@@ -16,8 +16,6 @@ use Games::RailRoad::Train;
 use Graph;
 use Readonly;
 use Tk; # should come before POE
-use Tk::Dialog;
-use Tk::FBox;
 use Tk::ToolBar;
 use POE;
 
