@@ -101,13 +101,26 @@ sub _draw_segment {
     }
 
     # create the line.
-    $canvas->createLine(
-        $col1 * $tilelen,
-        $row1 * $tilelen,
-        $col1 * $tilelen + $endx,
-        $row1 * $tilelen + $endy,
-        -tags => [ "$row1,$col1-$row2,$col2" ],
-    );
+    my $x1 = $col1 * $tilelen;
+    my $y1 = $row1 * $tilelen;
+    my $x2 = $x1 + $endx;
+    my $y2 = $y1 + $endy;
+    my $tags = [ "$row1,$col1-$row2,$col2" ];
+    $canvas->createLine( $x1, $y1, $x2, $y2, -tags=>$tags );
+
+    # add some fancy drawing
+    my $div    = 3;
+    my $radius = 1;
+    foreach my $i ( 0 .. $div ) {
+        my $x = $x1 + $endx * $i / $div;
+        my $y = $y1 + $endy * $i / $div;
+        $canvas->createOval(
+            $x-$radius, $y-$radius,
+            $x+$radius, $y+$radius,
+            -fill => 'brown',
+            -tags => $tags,
+        );
+    }
 
 }
 
