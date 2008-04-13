@@ -243,25 +243,29 @@ sub _on_c_b1_motion {
 
     # resolve row & column.
     my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y,3);
-    return unless defined $newpos;
+    my ($oldpos, $oldrow, $oldcol) = @{ $h->{position} };
 
-    # check if we moved somehow.
-    my $oldpos = $h->{curpos};
-    return if defined($oldpos) && $oldpos eq $newpos;
+    # basic checks.
+    return unless defined $newpos;                     # new position is undef
+    return if defined($oldpos) && $oldpos eq $newpos;  # we did not move
 
-    # we moved: create new node & store new position
-    $h->{curpos} = $newpos;
-    my $newnode = Games::RailRoad::Node->new({row=>$newrow,col=>$newcol});
-    $h->{nodes}{$newpos} = $newnode;
+    # we moved: store new position & create new node.
+    $h->{position} = [$newpos, $newrow, $newcol];
+    if ( not exists $h->{nodes}{$newpos} ) {
+        my $n = Games::RailRoad::Node->new({row=>$newrow,col=>$newcol});
+        $h->{nodes}{$newpos} = $n;
+    }
+    my $newnode = $h->{nodes}{$newpos};
 
     # try to resolve old position.
     return unless defined $oldpos;
-    my ($oldrow, $oldcol) = split /,/, $oldpos;
+    my $oldnode = $h->{nodes}{$oldpos};
 
     # check if the move is a single segment.
     my $movex = $newcol - $oldcol;
     my $movey = $newrow - $oldrow;
-    my $newmove = "$movex,$movey";
+    my $newmove = join ',',  $movex,  $movey;
+    my $oldmove = join ',', -$movex, -$movey;
     my %dir = (
         '-1,-1' => 'nw',
         '-1,0'  => 'w',
@@ -277,13 +281,9 @@ sub _on_c_b1_motion {
         return;
     }
     my $newdir = $dir{$newmove};
-
-    # check if the move is a valid one.
-    $movex = - $movex;
-    $movey = - $movey;
-    my $oldmove =  "$movex,$movey";
     my $olddir = $dir{$oldmove};
-    my $oldnode = $h->{nodes}{$oldpos};
+
+    # check if we can morph the nodes with this move.
     return unless $oldnode->connectable($newdir)
         && $newnode->connectable($olddir);
     $oldnode->connect($newdir);
@@ -308,10 +308,11 @@ sub _on_c_b1_press {
     my ($pos, $row, $col) = _resolve_coords($x,$y,3);
 
     # store current position - even undef.
-    $h->{curpos} = $pos;
+    $h->{position} = [$pos, $row, $col];
 
     # create the node if possible.
     return unless defined $pos;
+    return if defined $h->{nodes}{$pos};
     my $node = Games::RailRoad::Node->new({row=>$row,col=>$col});
     $h->{nodes}{$pos} = $node;
 }
@@ -374,6 +375,9 @@ sub _on_c_b3_motion {
 sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
+    my ($pos, $row, $col) = _resolve_coords($x,$y,2);
+    use Data::Dumper; print Dumper($h->{nodes}{$pos});
+
     $h->{delpos} = [$x,$y];
 }
 
