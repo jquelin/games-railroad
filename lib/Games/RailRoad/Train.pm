@@ -60,9 +60,9 @@ C<Games::RailRoad::Train> provides a train object.
 
 =head1 CONSTRUCTOR
 
-=head2 my $rail = Games::RailRoad::Rail->new( \%opts );
+=head2 my $train = Games::RailRoad::Train->new( \%opts );
 
-Create a new rail object. One can pass a hash reference with the
+Create a new train object. One can pass a hash reference with the
 following keys:
 
 
