@@ -242,7 +242,7 @@ sub _on_c_b1_motion {
     my (undef, $x, $y) = @$args;
 
     # resolve row & column.
-    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y,3);
+    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y,2/5);
     my ($oldpos, $oldrow, $oldcol) = @{ $h->{position} };
 
     # basic checks.
@@ -305,7 +305,7 @@ sub _on_c_b1_press {
     my (undef, $x, $y) = @$args;
 
     # resolve row & column.
-    my ($pos, $row, $col) = _resolve_coords($x,$y,3);
+    my ($pos, $row, $col) = _resolve_coords($x,$y,2/5);
 
     # store current position - even undef.
     $h->{position} = [$pos, $row, $col];
@@ -331,7 +331,7 @@ sub _on_c_b2_press {
 
     return if defined $h->{train}; # only one train
 
-    my ($pos, $row, $col) = _resolve_coords($x,$y,2);
+    my ($pos, $row, $col) = _resolve_coords($x,$y,0.5);
 
     # check if there's a rail at $pos
     if ( not $graph->has_vertex($pos) ) {
@@ -375,7 +375,7 @@ sub _on_c_b3_motion {
 sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my ($pos, $row, $col) = _resolve_coords($x,$y,2);
+    my ($pos, $row, $col) = _resolve_coords($x,$y,0.5);
     use Data::Dumper; print Dumper($h->{nodes}{$pos});
 
     $h->{delpos} = [$x,$y];
@@ -413,25 +413,19 @@ sub _on_c_b3_release {
 # -- PRIVATE SUBS
 
 #
-# my ($pos, $row, $col) = _resolve_coords($x, $y, $div);
+# my ($pos, $row, $col) = _resolve_coords($x, $y, $precision);
 #
 # the canvas deals with pixels: this sub transforms canvas coordinates
 # ($x,$y) in the $row and $col of the matching node.
 #
-# if we're not close enough of a node, precision is not enough: $pos
-# will be undef.
-#
-# $div allows one to set the precision: $TILELEN will be divided by
-# $div, and _rersolve_coords() will return a node only if it's in the
-# first (or last) division. that is, if $div == 2, a node will always be
-# returned. if $div == 3, the middle third will return undef. if $div ==
-# 4, then the half segment will return undef.
+# if we're not close enough of a node (within a square of $TILELEN times
+# $precision), precision is not enough: $pos will be undef.
 #
 # $pos is the string "$row-$col".
 #
 #
 sub _resolve_coords {
-    my ($x, $y, $div) = @_;
+    my ($x, $y, $prec) = @_;
 
     my $col = int( $x/$TILELEN );
     my $row = int( $y/$TILELEN );
@@ -440,14 +434,14 @@ sub _resolve_coords {
     $x %= $TILELEN;
     $y %= $TILELEN;
     given ($x) {
-        when( $_ > $TILELEN * ($div-1)/$div ) { $col++; }
-        when( $_ < $TILELEN / $div          ) { } # nothing to do
-        default { return; }                       # not precise enough
+        when( $_ > $TILELEN * (1-$prec) ) { $col++; }
+        when( $_ < $TILELEN * $prec     ) { } # nothing to do
+        default { return; }                   # not precise enough
     }
     given ($y) {
-        when( $_ > $TILELEN * ($div-1)/$div ) { $row++; }
-        when( $_ < $TILELEN / $div          ) { } # nothing to do
-        default { return; }                       # not precise enough
+        when( $_ > $TILELEN * (1-$prec) ) { $row++; }
+        when( $_ < $TILELEN * $prec     ) { } # nothing to do
+        default { return; }                   # not precise enough
     }
 
     return ("$row,$col", $row, $col);
