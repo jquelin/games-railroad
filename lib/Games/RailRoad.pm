@@ -518,11 +518,6 @@ limited to):
 
 =item * support for switches on nodes with more than 2 edges
 
-=item * support for "impossible" nodes (no 90-turn, no more than 4
-edges)
-
-=item * prettier drawing of rails
-
 =item * adding coaches to trains
 
 =item * fixing speed change in diagonal rails
