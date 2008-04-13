@@ -12,8 +12,9 @@ use strict;
 use warnings;
 use 5.010;
 
+use Games::RailRoad::Node;
 use Games::RailRoad::Train;
-use Graph;
+#use Graph;
 use Readonly;
 use Tk; # should come before POE
 use Tk::ToolBar;
@@ -184,7 +185,8 @@ sub _on_start {
     $h->{w}{canvas} = $c;
 
     # -- various heap initializations
-    $h->{graph} = Graph->new( undirected => 1 );
+    $h->{nodes} = {};
+    #$h->{graph} = Graph->new( undirected => 1 );
     $h->{train} = undef;
     #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
 
@@ -247,26 +249,49 @@ sub _on_c_b1_motion {
     my $oldpos = $h->{curpos};
     return if defined($oldpos) && $oldpos eq $newpos;
 
-    # check if old position was defined.
-    if ( defined $oldpos ) {
-        my ($oldrow, $oldcol) = split /,/, $oldpos;
-
-        if ( abs( $newrow - $oldrow ) < 2 &&
-             abs( $newcol - $oldcol ) < 2 ) {
-            # add the new rail.
-            $h->{graph}->add_edge( $oldpos, $newpos );
-            $h->{w}{canvas}->createLine(
-                $oldcol * $TILELEN,
-                $oldrow * $TILELEN,
-                $newcol * $TILELEN,
-                $newrow * $TILELEN,
-                -tags => [ "$oldpos-$newpos" ],
-            );
-        }
-    }
-
-    # store current position.
+    # we moved: create new node & store new position
     $h->{curpos} = $newpos;
+    my $newnode = Games::RailRoad::Node->new({row=>$newrow,col=>$newcol});
+    $h->{nodes}{$newpos} = $newnode;
+
+    # try to resolve old position.
+    return unless defined $oldpos;
+    my ($oldrow, $oldcol) = split /,/, $oldpos;
+
+    # check if the move is a single segment.
+    my $movex = $newcol - $oldcol;
+    my $movey = $newrow - $oldrow;
+    my $newmove = "$movex,$movey";
+    my %dir = (
+        '-1,-1' => 'nw',
+        '-1,0'  => 'w',
+        '-1,1'  => 'sw',
+        '0,-1'  => 'n',
+        '0,1'   => 's',
+        '1,-1'  => 'ne',
+        '1,0'   => 'e',
+        '1,1'   => 'se',
+    );
+    if ( not exists $dir{$newmove} ) {
+        warn "cannot move according to ($newmove)\n";
+        return;
+    }
+    my $newdir = $dir{$newmove};
+
+    # check if the move is a valid one.
+    $movex = - $movex;
+    $movey = - $movey;
+    my $oldmove =  "$movex,$movey";
+    my $olddir = $dir{$oldmove};
+    my $oldnode = $h->{nodes}{$oldpos};
+    return unless $oldnode->connectable($newdir)
+        && $newnode->connectable($olddir);
+    $oldnode->connect($newdir);
+    $newnode->connect($olddir);
+
+    # redraw the 2 nodes.
+    $oldnode->draw( $h->{w}{canvas}, $TILELEN );
+    $newnode->draw( $h->{w}{canvas}, $TILELEN );
 }
 
 
@@ -284,6 +309,11 @@ sub _on_c_b1_press {
 
     # store current position - even undef.
     $h->{curpos} = $pos;
+
+    # create the node if possible.
+    return unless defined $pos;
+    my $node = Games::RailRoad::Node->new({row=>$row,col=>$col});
+    $h->{nodes}{$pos} = $node;
 }
 
 
