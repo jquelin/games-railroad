@@ -20,20 +20,6 @@ __PACKAGE__->mk_accessors( qw{ col row } );
 
 # -- PUBLIC METHODS
 
-sub draw {
-    my ($self, $canvas, $tilelen) = @_;
-    my $row = $self->row;
-    my $col = $self->col;
-    $canvas->delete("$row-$col");
-
-    my $class = ref $self;
-    $class =~ s/^.*:://;
-    return if $class eq 'Node'; # naked node
-    $self->_draw_segment(lc($_), $canvas, $tilelen)
-        foreach split /_/, $class;
-}
-
-
 #
 # $node->connect( $dir );
 #
@@ -63,6 +49,26 @@ sub connectable {
     my ($self, $dir) = @_;
     my $map = $self->_transform_map;
     return exists $map->{$dir};
+}
+
+
+#
+# $node->draw( $canvas, $tilelen );
+#
+# Request $node to draw itself on $canvas, assuming that each
+# square has a length of $tilelen.
+#
+sub draw {
+    my ($self, $canvas, $tilelen) = @_;
+    my $row = $self->row;
+    my $col = $self->col;
+    $canvas->delete("$row-$col");
+
+    my $class = ref $self;
+    $class =~ s/^.*:://;
+    return if $class eq 'Node'; # naked node
+    $self->_draw_segment(lc($_), $canvas, $tilelen)
+        foreach split /_/, $class;
 }
 
 
