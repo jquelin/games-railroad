@@ -266,22 +266,12 @@ sub _on_c_b1_motion {
     my $movey = $newrow - $oldrow;
     my $newmove = join ',',  $movex,  $movey;
     my $oldmove = join ',', -$movex, -$movey;
-    my %dir = (
-        '-1,-1' => 'nw',
-        '-1,0'  => 'w',
-        '-1,1'  => 'sw',
-        '0,-1'  => 'n',
-        '0,1'   => 's',
-        '1,-1'  => 'ne',
-        '1,0'   => 'e',
-        '1,1'   => 'se',
-    );
-    if ( not exists $dir{$newmove} ) {
+    my $newdir = _dir_coords( $newmove );
+    my $olddir = _dir_coords( $oldmove );
+    if ( not defined $newdir ) {
         warn "cannot move according to ($newmove)\n";
         return;
     }
-    my $newdir = $dir{$newmove};
-    my $olddir = $dir{$oldmove};
 
     # check if we can morph the nodes with this move.
     return unless $oldnode->connectable($newdir)
@@ -411,6 +401,29 @@ sub _on_c_b3_release {
 
 
 # -- PRIVATE SUBS
+
+#
+# my $coords = _dir_coords( $dir );
+# my $dir    = _dir_coords( $coords );
+#
+# given a direction ('n', 'se', etc.) or some coords ('1,-1', '0,1',
+# etc.), return the corresponding coords or (resp.) dir.
+#
+sub _dir_coords {
+    my @dirs = (
+        '-1,-1' => 'nw',
+        '-1,0'  => 'w',
+        '-1,1'  => 'sw',
+        '0,-1'  => 'n',
+        '0,1'   => 's',
+        '1,-1'  => 'ne',
+        '1,0'   => 'e',
+        '1,1'   => 'se',
+    );
+    my %dir = ( @dirs, reverse @dirs );
+    return $dir{ $_[0] };
+}
+
 
 #
 # my ($pos, $row, $col) = _resolve_coords($x, $y, $precision);
