@@ -36,6 +36,14 @@ sub connect {
     # rebless the object in its new class.
     $map->{$dir}->require;
     bless $self, $map->{$dir};
+
+    # initialize switch if needed.
+    # FIXME: shouldn't it be it GRN:Switch:_init with an inconditional
+    #        call to _init?
+    if ( $self->isa('Games::RailRoad::Node::Switch')
+        && not defined $self->_switch ) {
+        $self->_switch(0);
+    }
 }
 
 
