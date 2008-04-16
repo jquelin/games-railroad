@@ -95,6 +95,9 @@ sub next_dir {
 }
 
 
+sub switch {}
+
+
 # -- PRIVATE METHODS
 
 #

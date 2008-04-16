@@ -14,6 +14,14 @@ use warnings;
 use base qw{ Games::RailRoad::Node };
 __PACKAGE__->mk_accessors( qw{ _switch } );
 
+# -- PUBLIC METHODS
+
+sub switch {
+    my ($self) = @_;
+    $self->_switch( ($self->_switch + 1) % 2 );
+}
+
+
 1;
 __END__
 
