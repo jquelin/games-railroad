@@ -19,7 +19,7 @@ use base qw{ Games::RailRoad::Node::Switch };
 
 sub _next_map {
     return {
-        'e'  => qw{ nw w }[ $_->_switch ],
+        'e'  => qw{ nw w }[ $_[0]->_switch ],
         'nw' => 'e',
         'w'  => 'e',
     };

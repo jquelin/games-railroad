@@ -21,7 +21,7 @@ sub _next_map {
     return {
         'n'  => 'sw',
         'nw' => 'sw',
-        's'  => qw{ n nw }[ $_->_switch ],
+        's'  => qw{ n nw }[ $_[0]->_switch ],
     };
 }
 
