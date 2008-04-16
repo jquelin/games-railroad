@@ -51,6 +51,7 @@ sub spawn {
             _tick            => \&_on_tick,
             # gui events
             _b_quit          => \&_on_b_quit,
+            _c_b1_dblclick   => \&_on_c_b1_dblclick,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
             _c_b2_press      => \&_on_c_b2_press,
@@ -251,6 +252,27 @@ sub _on_tick {
 #
 sub _on_b_quit {
     $poe_main_window->destroy;
+}
+
+
+#
+# _on_c_b1_dblclick( [], [$stuff, $x, $y] );
+#
+# called when double-clicking left button. switch the node if possible
+# (Games::RailRoad::Node::Switch).
+#
+sub _on_c_b1_dblclick {
+    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
+    my (undef, $x, $y) = @$args;
+
+    # resolve column & row.
+    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
+    my $node = $h->{nodes}{$pos};
+    return unless defined($node);
+
+    # switch the exits.
+    $node->switch;
+    $node->draw($h->{w}{canvas}, $TILELEN);
 }
 
 
