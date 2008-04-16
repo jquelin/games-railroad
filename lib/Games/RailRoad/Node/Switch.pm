@@ -10,11 +10,41 @@ package Games::RailRoad::Node::Switch;
 
 use strict;
 use warnings;
+use 5.010;
 
+use Games::RailRoad; # FIXME
 use base qw{ Games::RailRoad::Node };
 __PACKAGE__->mk_accessors( qw{ _switch } );
 
 # -- PUBLIC METHODS
+
+sub draw {
+    my ($self, $canvas, $tilelen) = @_;
+    $self->SUPER::draw($canvas, $tilelen);
+
+    my $col = $self->col;
+    my $row = $self->row;
+    my $x = $col * $tilelen;
+    my $y = $row * $tilelen;
+    my $dir  = $self->_sw_exits->[ $self->_switch ];
+    my $move = Games::RailRoad::_dir_coords($dir); # FIXME
+    my ($dx,$dy) = split /,/, $move;
+
+    $dx *= $tilelen / 3;
+    $dy *= $tilelen / 3;
+    $x += $dx;
+    $y += $dy;
+
+    # add some fancy drawing
+    my $radius = 2;
+    $canvas->createOval(
+        $x-$radius, $y-$radius,
+        $x+$radius, $y+$radius,
+        -outline => 'green',
+        -tags => [ "$col,$row" ],
+    );
+
+}
 
 sub switch {
     my ($self) = @_;
