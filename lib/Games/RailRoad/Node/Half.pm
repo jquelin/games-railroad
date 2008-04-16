@@ -13,6 +13,12 @@ use warnings;
 
 use base qw{ Games::RailRoad::Node };
 
+# -- PRIVATE METHODS
+
+sub _next_map {
+    return {};
+}
+
 
 1;
 __END__

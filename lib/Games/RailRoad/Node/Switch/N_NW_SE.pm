@@ -15,6 +15,17 @@ use base qw{ Games::RailRoad::Node::Switch };
 
 
 
+# -- PRIVATE METHODS
+
+sub _next_map {
+    return {
+        'n'  => 'se',
+        'nw' => 'se',
+        'se' => qw{ n nw }[ $_->_switch ],
+    };
+}
+
+
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Node::';
     return {

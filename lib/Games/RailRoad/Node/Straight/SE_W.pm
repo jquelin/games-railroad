@@ -15,6 +15,16 @@ use base qw{ Games::RailRoad::Node::Straight };
 
 
 
+# -- PRIVATE METHODS
+
+sub _next_map {
+    return {
+        'se' => 'w',
+        'w'  => 'se',
+    };
+}
+
+
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Node::';
     return {

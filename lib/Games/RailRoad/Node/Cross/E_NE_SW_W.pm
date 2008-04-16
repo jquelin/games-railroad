@@ -15,6 +15,18 @@ use base qw{ Games::RailRoad::Node::Cross };
 
 
 
+# -- PRIVATE METHODS
+
+sub _next_map {
+    return {
+        'e'  => 'w',
+        'ne' => 'sw',
+        'sw' => 'ne',
+        'w'  => 'e',
+    };
+}
+
+
 sub _transform_map {
     return {};
 }
