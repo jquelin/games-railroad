@@ -210,9 +210,24 @@ sub _on_tick {
         my $from = $train->from;
         my $to   = $train->to;
 
-        my @neighbours = grep { $_ ne $from } $h->{graph}->neighbours($to);
+        my ($fcol, $frow) = split /,/, $from;
+        my ($tcol, $trow) = split /,/, $to;
+
+        my $dcol = $fcol-$tcol;
+        my $drow = $frow-$trow;
+        my $move = "$dcol,$drow";
+        my $dir  = _dir_coords($move);
+
+        my $next = $h->{nodes}{$to}->next_dir($dir);
+        return unless defined $next; # dead-end
+        $move = _dir_coords($next);
+        ($dcol, $drow) = split /,/, $move;
+
+        my ($col, $row) = split /,/, $to;
+        $col += $dcol;
+        $row += $drow;
         $train->from($to);
-        $train->to($neighbours[0]);
+        $train->to("$col,$row");
     }
 
     $train->frac($frac);
@@ -317,25 +332,38 @@ sub _on_c_b1_press {
 sub _on_c_b2_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my $graph = $h->{graph};
 
     return if defined $h->{train}; # only one train
 
     my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
 
-    # check if there's a rail at $pos
-    if ( not $graph->has_vertex($pos) ) {
+    # check if there's a rail at $pos.
+    if ( not exists $h->{nodes}{$pos} ) {
         warn "no rail at ($pos)\n";
         return;
     }
 
-    my @neighbours = $graph->neighbours($pos);
+    # pick a random dir at first.
+    my $dirs = $h->{nodes}{$pos}->_next_map;
+    my @dirs = keys %$dirs;
+    if ( scalar @dirs == 0 ) {
+        warn "nowhere to move on\n";
+        return;
+    }
+    my $dir  = $dirs[ rand @dirs ];
+    my $move = _dir_coords($dir);
+    my ($dcol, $drow) = split /,/, $move;
+    $col += $dcol;
+    $row += $drow;
+    my $to = "$col,$row";
+
+    # create the train.
     $h->{train} = Games::RailRoad::Train->new( {
         from => $pos,
-        to   => $neighbours[0],
+        to   => $to,
         frac => 0,
     } );
-    $h->{train}->draw($h->{w}{canvas}, $TILELEN);
+    $h->{train}->draw( $h->{w}{canvas}, $TILELEN );
 }
 
 
