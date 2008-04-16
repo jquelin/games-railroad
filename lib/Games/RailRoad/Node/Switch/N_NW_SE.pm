@@ -21,9 +21,12 @@ sub _next_map {
     return {
         'n'  => 'se',
         'nw' => 'se',
-        'se' => qw{ n nw }[ $_[0]->_switch ],
+        'se' => $_[0]->_sw_exits->[ $_[0]->_switch ],
     };
 }
+
+
+sub _sw_exits { return [ qw{ n nw } ]; }
 
 
 sub _transform_map {
