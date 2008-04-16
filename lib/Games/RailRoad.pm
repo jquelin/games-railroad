@@ -176,13 +176,20 @@ sub _on_start {
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
     $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
-    $c->CanvasBind( '<B1-Motion>',     [$s->postback('_c_b1_motion'), Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<ButtonPress-1>', [$s->postback('_c_b1_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<ButtonPress-2>', [$s->postback('_c_b2_press'),  Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<B3-Motion>',       [$s->postback('_c_b3_motion'),   Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<ButtonPress-3>',   [$s->postback('_c_b3_press'),    Ev('x'), Ev('y')] );
-    $c->CanvasBind( '<ButtonRelease-3>', [$s->postback('_c_b3_release'),  Ev('x'), Ev('y')] );
     $h->{w}{canvas} = $c;
+
+    # binding canvas events.
+    my %event = (
+        '<B1-Motion>'            => '_c_b1_motion',
+        '<Double-ButtonPress-1>' => '_c_b1_dblclick',
+        '<ButtonPress-1>'        => '_c_b1_press',
+        '<ButtonPress-2>'        => '_c_b2_press',
+        '<B3-Motion>'            => '_c_b3_motion',
+        '<ButtonPress-3>'        => '_c_b3_press',
+        '<ButtonRelease-3>'      => '_c_b3_release',
+    );
+    $c->CanvasBind($_ , [$s->postback($event{$_}), Ev('x'), Ev('y')] )
+        foreach keys %event;
 
     # -- various heap initializations
     $h->{nodes} = {};
