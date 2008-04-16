@@ -15,6 +15,8 @@ use base qw{ Games::RailRoad::Node::Half };
 
 
 
+# -- PRIVATE METHODS
+
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Node::';
     return {
