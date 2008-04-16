@@ -55,7 +55,7 @@ sub connectable {
 #
 # $node->draw( $canvas, $tilelen );
 #
-# Request $node to draw itself on $canvas, assuming that each
+# request $node to draw itself on $canvas, assuming that each
 # square has a length of $tilelen.
 #
 sub draw {
@@ -69,6 +69,21 @@ sub draw {
     return if $class eq 'Node'; # naked node
     $self->_draw_segment(lc($_), $canvas, $tilelen)
         foreach split /_/, $class;
+}
+
+
+#
+# my $to = $node->next_dir( $from );
+#
+# when $node is reached by a train, this method will return the next
+# direction to head to, assuming the train was coming from $from.
+#
+# can return undef if there's no such $from configured, or if the node
+# is a dead-end.
+#
+sub next_dir {
+    my ($self, $from) = @_;
+    return $self->_next_map->{$from};
 }
 
 
@@ -250,6 +265,15 @@ false.
 
 Request C<$node> to draw itself on C<$canvas>, assuming that each square
 has a length of C<$tilelen>.
+
+
+=head2 my $to = $node->next_dir( $from );
+
+When C<$node> is reached by a train, this method will return the next
+direction to head to, assuming the train was coming from C<$from>.
+
+Note that the method can return undef if there's no such C<$from>
+configured, or if the node is a dead-end.
 
 
 
