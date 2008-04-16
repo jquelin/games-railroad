@@ -23,8 +23,8 @@ use POE;
 
 our $VERSION = '0.01';
 
-Readonly my $NBROWS  => 40;
 Readonly my $NBCOLS  => 60;
+Readonly my $NBROWS  => 40;
 Readonly my $TILELEN => 20;    # in pixels
 Readonly my $TICK    => 0.050; # in seconds
 
@@ -241,18 +241,18 @@ sub _on_c_b1_motion {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
 
-    # resolve row & column.
-    my ($newpos, $newrow, $newcol) = _resolve_coords($x,$y,2/5);
-    my ($oldpos, $oldrow, $oldcol) = @{ $h->{position} };
+    # resolve column & row.
+    my ($newpos, $newcol, $newrow) = _resolve_coords($x,$y,2/5);
+    my ($oldpos, $oldcol, $oldrow) = @{ $h->{position} };
 
     # basic checks.
     return unless defined $newpos;                     # new position is undef
     return if defined($oldpos) && $oldpos eq $newpos;  # we did not move
 
     # we moved: store new position & create new node.
-    $h->{position} = [$newpos, $newrow, $newcol];
+    $h->{position} = [$newpos, $newcol, $newrow];
     if ( not exists $h->{nodes}{$newpos} ) {
-        my $n = Games::RailRoad::Node->new({row=>$newrow,col=>$newcol});
+        my $n = Games::RailRoad::Node->new({col=>$newcol,row=>$newrow});
         $h->{nodes}{$newpos} = $n;
     }
     my $newnode = $h->{nodes}{$newpos};
@@ -294,16 +294,16 @@ sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
     my (undef, $x, $y) = @$args;
 
-    # resolve row & column.
-    my ($pos, $row, $col) = _resolve_coords($x,$y,2/5);
+    # resolve column & row.
+    my ($pos, $col, $row) = _resolve_coords($x,$y,2/5);
 
     # store current position - even undef.
-    $h->{position} = [$pos, $row, $col];
+    $h->{position} = [$pos, $col, $row];
 
     # create the node if possible.
     return unless defined $pos;
     return if defined $h->{nodes}{$pos};
-    my $node = Games::RailRoad::Node->new({row=>$row,col=>$col});
+    my $node = Games::RailRoad::Node->new({col=>$col,row=>$row});
     $h->{nodes}{$pos} = $node;
 }
 
@@ -321,7 +321,7 @@ sub _on_c_b2_press {
 
     return if defined $h->{train}; # only one train
 
-    my ($pos, $row, $col) = _resolve_coords($x,$y,0.5);
+    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
 
     # check if there's a rail at $pos
     if ( not $graph->has_vertex($pos) ) {
@@ -365,7 +365,7 @@ sub _on_c_b3_motion {
 sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my ($pos, $row, $col) = _resolve_coords($x,$y,0.5);
+    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
     use Data::Dumper; print Dumper($h->{nodes}{$pos});
 
     $h->{delpos} = [$x,$y];
@@ -426,15 +426,15 @@ sub _dir_coords {
 
 
 #
-# my ($pos, $row, $col) = _resolve_coords($x, $y, $precision);
+# my ($pos, $col, $row) = _resolve_coords($x, $y, $precision);
 #
 # the canvas deals with pixels: this sub transforms canvas coordinates
-# ($x,$y) in the $row and $col of the matching node.
+# ($x,$y) in the $col and $row of the matching node.
 #
 # if we're not close enough of a node (within a square of $TILELEN times
 # $precision), precision is not enough: $pos will be undef.
 #
-# $pos is the string "$row-$col".
+# $pos is the string "$col-$row".
 #
 #
 sub _resolve_coords {
@@ -457,7 +457,7 @@ sub _resolve_coords {
         default { return; }                   # not precise enough
     }
 
-    return ("$row,$col", $row, $col);
+    return ("$col,$row", $col, $row);
 }
 
 

@@ -60,9 +60,9 @@ sub connectable {
 #
 sub draw {
     my ($self, $canvas, $tilelen) = @_;
-    my $row = $self->row;
     my $col = $self->col;
-    $canvas->delete("$row-$col");
+    my $row = $self->row;
+    $canvas->delete("$col,$row");
 
     my $class = ref $self;
     $class =~ s/^.*:://;
@@ -92,16 +92,16 @@ sub next_dir {
 #
 # $node->_draw_segment( $segment, $canvas, $tilelen )
 #
-# draw $segment of $node (at the correct row / col) on $canvas, assuming
+# draw $segment of $node (at the correct col / row) on $canvas, assuming
 # a square length of $tilelen. $segment can be one of nw, n, ne, w, e,
 # sw, s, se.
 #
 sub _draw_segment {
     my ($self, $segment, $canvas, $tilelen) = @_;
 
-    my $row1 = $self->row;
     my $col1 = $self->col;
-    my ($row2, $col2) = ($row1, $col1);
+    my $row1 = $self->row;
+    my ($col2, $row2) = ($col1, $row1);
 
     # compute the end of the segment.
     my ($endx, $endy);
@@ -120,7 +120,7 @@ sub _draw_segment {
     my $y1 = $row1 * $tilelen;
     my $x2 = $x1 + $endx;
     my $y2 = $y1 + $endy;
-    my $tags = [ "$row1,$col1-$row2,$col2" ];
+    my $tags = [ "$col1,$row1", "$col1,$row1-$col2,$row2" ];
     $canvas->createLine( $x1, $y1, $x2, $y2, -tags=>$tags );
 
     # add some fancy drawing
