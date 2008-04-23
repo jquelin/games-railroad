@@ -23,7 +23,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Class::Accessor::Fast' => 0,
         'Getopt::Euclid'        => 0,
-        'Graph'                 => 0,
         'POE'                   => 0,
         'Readonly'              => 0,
         'Test::More'            => 0,
