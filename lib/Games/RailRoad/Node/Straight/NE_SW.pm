@@ -28,10 +28,12 @@ sub _next_map {
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Node::';
     return {
-        'e'  => $prefix . 'Switch::E_NE_SW',
-        'n'  => $prefix . 'Switch::N_NE_SW',
-        's'  => $prefix . 'Switch::NE_S_SW',
-        'w'  => $prefix . 'Switch::NE_SW_W',
+        'e'   => $prefix . 'Switch::E_NE_SW',
+        'n'   => $prefix . 'Switch::N_NE_SW',
+        's'   => $prefix . 'Switch::NE_S_SW',
+        'w'   => $prefix . 'Switch::NE_SW_W',
+        '-ne' => $prefix . 'Half::SW',
+        '-sw' => $prefix . 'Half::NE',
     };
 }
 

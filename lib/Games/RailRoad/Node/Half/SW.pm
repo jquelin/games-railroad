@@ -18,11 +18,12 @@ use base qw{ Games::RailRoad::Node::Half };
 # -- PRIVATE METHODS
 
 sub _transform_map {
-    my $prefix = 'Games::RailRoad::Node::';
+    my $prefix = 'Games::RailRoad::Node';
     return {
-        'e'  => $prefix . 'Straight::E_SW',
-        'n'  => $prefix . 'Straight::N_SW',
-        'ne' => $prefix . 'Straight::NE_SW',
+        'e'   => $prefix . '::Straight::E_SW',
+        'n'   => $prefix . '::Straight::N_SW',
+        'ne'  => $prefix . '::Straight::NE_SW',
+        '-sw' => $prefix,
     };
 }
 

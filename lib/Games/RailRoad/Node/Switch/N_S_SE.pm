@@ -32,7 +32,9 @@ sub _sw_exits { return [ qw{ s se } ]; }
 sub _transform_map {
     my $prefix = 'Games::RailRoad::Node::';
     return {
-        'nw' => $prefix . 'Cross::N_NW_S_SE',
+        'nw'  => $prefix . 'Cross::N_NW_S_SE',
+        '-s'  => $prefix . 'Straight::N_SE',
+        '-se' => $prefix . 'Straight::N_S',
     };
 }
 
