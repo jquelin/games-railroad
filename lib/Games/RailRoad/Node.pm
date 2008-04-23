@@ -61,6 +61,18 @@ sub connectable {
 
 
 #
+# $node->delete( $canvas );
+#
+# request $node to delete itself from $canvas.
+#
+sub delete {
+    my ($self, $canvas) = @_;
+    my $col = $self->col;
+    my $row = $self->row;
+    $canvas->delete("$col,$row");
+}
+
+#
 # $node->draw( $canvas, $tilelen );
 #
 # request $node to draw itself on $canvas, assuming that each
@@ -68,9 +80,7 @@ sub connectable {
 #
 sub draw {
     my ($self, $canvas, $tilelen) = @_;
-    my $col = $self->col;
-    my $row = $self->row;
-    $canvas->delete("$col,$row");
+    $self->delete($canvas);
 
     my $class = ref $self;
     $class =~ s/^.*:://;
@@ -272,10 +282,16 @@ C<se>. Of course, other values are accepted but will return always
 false.
 
 
+=head2 $node->delete( $canvas );
+
+Request C<$node> to remove itself from C<$canvas>.
+
+
 =head2 $node->draw( $canvas, $tilelen );
 
 Request C<$node> to draw itself on C<$canvas>, assuming that each square
-has a length of C<$tilelen>.
+has a length of C<$tilelen>. Note that this method calls the C<delete()>
+method first.
 
 
 =head2 my $to = $node->next_dir( $from );
