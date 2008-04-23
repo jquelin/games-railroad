@@ -9,6 +9,13 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.02 Wed Apr 23 17:41:23 CEST 2008
+ - changed internals from Graph to home-made internals
+ - forbidding impossible rails
+ - fancy rail drawing
+ - switches now can be changed (dbl-clicks)
+ - fancy switches drawing
+
 0.01 Sat Apr 12 15:03:58 CEST 2008
  - original version
  - basic window with rail drawing, train moving

@@ -1,6 +1,6 @@
 ---
 name: Games-RailRoad
-version: 0.01
+version: 0.02
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: a train simulation game
@@ -10,7 +10,6 @@ resources:
 requires:
   Class::Accessor::Fast: 0
   Getopt::Euclid: 0
-  Graph: 0
   POE: 0
   Readonly: 0
   Tk: 0
@@ -19,7 +18,6 @@ requires:
 build_requires:
   Class::Accessor::Fast: 0
   Getopt::Euclid: 0
-  Graph: 0
   POE: 0
   Readonly: 0
   Test::More: 0
@@ -32,7 +30,99 @@ recommends:
 provides:
   Games::RailRoad:
     file: lib/Games/RailRoad.pm
-    version: 0.01
+    version: 0.02
+  Games::RailRoad::Node:
+    file: lib/Games/RailRoad/Node.pm
+  Games::RailRoad::Node::Cross:
+    file: lib/Games/RailRoad/Node/Cross.pm
+  Games::RailRoad::Node::Cross::E_NE_SW_W:
+    file: lib/Games/RailRoad/Node/Cross/E_NE_SW_W.pm
+  Games::RailRoad::Node::Cross::E_NW_SE_W:
+    file: lib/Games/RailRoad/Node/Cross/E_NW_SE_W.pm
+  Games::RailRoad::Node::Cross::N_NE_S_SW:
+    file: lib/Games/RailRoad/Node/Cross/N_NE_S_SW.pm
+  Games::RailRoad::Node::Cross::N_NW_S_SE:
+    file: lib/Games/RailRoad/Node/Cross/N_NW_S_SE.pm
+  Games::RailRoad::Node::Half:
+    file: lib/Games/RailRoad/Node/Half.pm
+  Games::RailRoad::Node::Half::E:
+    file: lib/Games/RailRoad/Node/Half/E.pm
+  Games::RailRoad::Node::Half::N:
+    file: lib/Games/RailRoad/Node/Half/N.pm
+  Games::RailRoad::Node::Half::NE:
+    file: lib/Games/RailRoad/Node/Half/NE.pm
+  Games::RailRoad::Node::Half::NW:
+    file: lib/Games/RailRoad/Node/Half/NW.pm
+  Games::RailRoad::Node::Half::S:
+    file: lib/Games/RailRoad/Node/Half/S.pm
+  Games::RailRoad::Node::Half::SE:
+    file: lib/Games/RailRoad/Node/Half/SE.pm
+  Games::RailRoad::Node::Half::SW:
+    file: lib/Games/RailRoad/Node/Half/SW.pm
+  Games::RailRoad::Node::Half::W:
+    file: lib/Games/RailRoad/Node/Half/W.pm
+  Games::RailRoad::Node::Straight:
+    file: lib/Games/RailRoad/Node/Straight.pm
+  Games::RailRoad::Node::Straight::E_NW:
+    file: lib/Games/RailRoad/Node/Straight/E_NW.pm
+  Games::RailRoad::Node::Straight::E_SW:
+    file: lib/Games/RailRoad/Node/Straight/E_SW.pm
+  Games::RailRoad::Node::Straight::E_W:
+    file: lib/Games/RailRoad/Node/Straight/E_W.pm
+  Games::RailRoad::Node::Straight::NE_S:
+    file: lib/Games/RailRoad/Node/Straight/NE_S.pm
+  Games::RailRoad::Node::Straight::NE_SW:
+    file: lib/Games/RailRoad/Node/Straight/NE_SW.pm
+  Games::RailRoad::Node::Straight::NE_W:
+    file: lib/Games/RailRoad/Node/Straight/NE_W.pm
+  Games::RailRoad::Node::Straight::NW_S:
+    file: lib/Games/RailRoad/Node/Straight/NW_S.pm
+  Games::RailRoad::Node::Straight::NW_SE:
+    file: lib/Games/RailRoad/Node/Straight/NW_SE.pm
+  Games::RailRoad::Node::Straight::N_S:
+    file: lib/Games/RailRoad/Node/Straight/N_S.pm
+  Games::RailRoad::Node::Straight::N_SE:
+    file: lib/Games/RailRoad/Node/Straight/N_SE.pm
+  Games::RailRoad::Node::Straight::N_SW:
+    file: lib/Games/RailRoad/Node/Straight/N_SW.pm
+  Games::RailRoad::Node::Straight::SE_W:
+    file: lib/Games/RailRoad/Node/Straight/SE_W.pm
+  Games::RailRoad::Node::Switch:
+    file: lib/Games/RailRoad/Node/Switch.pm
+  Games::RailRoad::Node::Switch::E_NE_SW:
+    file: lib/Games/RailRoad/Node/Switch/E_NE_SW.pm
+  Games::RailRoad::Node::Switch::E_NE_W:
+    file: lib/Games/RailRoad/Node/Switch/E_NE_W.pm
+  Games::RailRoad::Node::Switch::E_NW_SE:
+    file: lib/Games/RailRoad/Node/Switch/E_NW_SE.pm
+  Games::RailRoad::Node::Switch::E_NW_W:
+    file: lib/Games/RailRoad/Node/Switch/E_NW_W.pm
+  Games::RailRoad::Node::Switch::E_SE_W:
+    file: lib/Games/RailRoad/Node/Switch/E_SE_W.pm
+  Games::RailRoad::Node::Switch::E_SW_W:
+    file: lib/Games/RailRoad/Node/Switch/E_SW_W.pm
+  Games::RailRoad::Node::Switch::NE_SW_W:
+    file: lib/Games/RailRoad/Node/Switch/NE_SW_W.pm
+  Games::RailRoad::Node::Switch::NE_S_SW:
+    file: lib/Games/RailRoad/Node/Switch/NE_S_SW.pm
+  Games::RailRoad::Node::Switch::NW_SE_W:
+    file: lib/Games/RailRoad/Node/Switch/NW_SE_W.pm
+  Games::RailRoad::Node::Switch::NW_S_SE:
+    file: lib/Games/RailRoad/Node/Switch/NW_S_SE.pm
+  Games::RailRoad::Node::Switch::N_NE_S:
+    file: lib/Games/RailRoad/Node/Switch/N_NE_S.pm
+  Games::RailRoad::Node::Switch::N_NE_SW:
+    file: lib/Games/RailRoad/Node/Switch/N_NE_SW.pm
+  Games::RailRoad::Node::Switch::N_NW_S:
+    file: lib/Games/RailRoad/Node/Switch/N_NW_S.pm
+  Games::RailRoad::Node::Switch::N_NW_SE:
+    file: lib/Games/RailRoad/Node/Switch/N_NW_SE.pm
+  Games::RailRoad::Node::Switch::N_S_SE:
+    file: lib/Games/RailRoad/Node/Switch/N_S_SE.pm
+  Games::RailRoad::Node::Switch::N_S_SW:
+    file: lib/Games/RailRoad/Node/Switch/N_S_SW.pm
+  Games::RailRoad::Node::Temp:
+    file: lib/Games/RailRoad/Node/Temp.pm
   Games::RailRoad::Train:
     file: lib/Games/RailRoad/Train.pm
 generated_by: Module::Build version 0.2808
