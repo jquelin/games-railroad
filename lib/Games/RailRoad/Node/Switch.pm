@@ -68,8 +68,18 @@ This package is a virtual class representing a node object with three
 branches. There is a switch, meaning one can change the exit associated
 to a given end.
 
+The following methods are implemented in this class:
+
+=over 4
+
+=item * draw
+
+=item * switch
+
+=back
+
 Refer to C<Games::RailRoad::Node> for a description of the various node
-types.
+types and methods.
 
 
 

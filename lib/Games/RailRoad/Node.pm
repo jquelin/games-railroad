@@ -119,6 +119,12 @@ sub next_dir {
 }
 
 
+#
+# $node->switch;
+#
+# request a node to change its exit, if possible. this is a no-op for
+# most nodes, except games::railroad::node::switch::*
+#
 sub switch {}
 
 
@@ -316,6 +322,7 @@ has a length of C<$tilelen>. Note that this method calls the C<delete()>
 method first.
 
 
+
 =head2 my $to = $node->next_dir( $from );
 
 When C<$node> is reached by a train, this method will return the next
@@ -323,6 +330,13 @@ direction to head to, assuming the train was coming from C<$from>.
 
 Note that the method can return undef if there's no such C<$from>
 configured, or if the node is a dead-end.
+
+
+
+=head2 $node->switch;
+
+Request a node to change its exit, if possible. This is a no-op for most
+nodes, except C<Games::Railroad::Node::Switch::*>.
 
 
 
