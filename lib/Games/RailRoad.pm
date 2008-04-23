@@ -551,10 +551,11 @@ Currently the module is very rough and supports very few operations:
 =item * drawing and connecting rails by left-clicking and dragging mouse
 on the canvas.
 
-=item * selecting an area to be deleted by right-clicking and dragging
-mouse on the canvas.
+=item * removing a node by right-clicking on it on the canvas.
 
 =item * placing a train on a rail by middle-clikcing on a rail on the canvas.
+
+=item * changing switch exits by double-clicking on it.
 
 =back
 
@@ -564,11 +565,7 @@ limited to):
 
 =over 4
 
-=item * support for "end-of-road" nodes (without any more edges)
-
 =item * support for more than one train
-
-=item * support for switches on nodes with more than 2 edges
 
 =item * adding coaches to trains
 
