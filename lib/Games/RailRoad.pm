@@ -55,9 +55,7 @@ sub spawn {
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
             _c_b2_press      => \&_on_c_b2_press,
-            _c_b3_motion     => \&_on_c_b3_motion,
             _c_b3_press      => \&_on_c_b3_press,
-            _c_b3_release    => \&_on_c_b3_release,
         },
         args => \%opts,
     );
@@ -185,9 +183,7 @@ sub _on_start {
         '<Double-ButtonPress-1>' => '_c_b1_dblclick',
         '<ButtonPress-1>'        => '_c_b1_press',
         '<ButtonPress-2>'        => '_c_b2_press',
-        '<B3-Motion>'            => '_c_b3_motion',
         '<ButtonPress-3>'        => '_c_b3_press',
-        '<ButtonRelease-3>'      => '_c_b3_release',
     );
     $c->CanvasBind($_ , [$s->postback($event{$_}), Ev('x'), Ev('y')] )
         foreach keys %event;
@@ -396,23 +392,6 @@ sub _on_c_b2_press {
 
 
 #
-# _on_c_b3_motion( [], [$stuff, $x, $y] );
-#
-# called when the mouse is moving on canvas while right button is down.
-# this will update the delete area.
-#
-sub _on_c_b3_motion {
-    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
-    my (undef, $x, $y) = @$args;
-
-    my $canvas = $h->{w}{canvas};
-    my $tag = 'delete-area';
-    $canvas->delete($tag);
-    $canvas->createRectangle( $x, $y, @{ $h->{delpos} }, -dash=>'.', -tags=>[$tag] );
-}
-
-
-#
 # _on_c_b3_press( [], [$stuff, $x, $y] );
 #
 # called when the right-button mouse is pressed on canvas. this will
@@ -422,37 +401,42 @@ sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
     my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
-    use Data::Dumper; print Dumper($h->{nodes}{$pos});
 
-    $h->{delpos} = [$x,$y];
-}
+    my $node = $h->{nodes}{$pos};
+    return unless defined $node;
 
+    # check if we can remove connection
+    my @connections = sort $node->connections;
+    foreach my $dir ( @connections ) {
+        my ($dcol, $drow) = split /,/, _dir_coords($dir);
+        my $col2 = $col + $dcol;
+        my $row2 = $row + $drow;
+        my $n = $h->{nodes}{"$col2,$row2"};
+        $dcol = -$dcol;
+        $drow = -$drow;
+        my $dir2 = _dir_coords("$dcol,$drow");
 
-#
-# _on_c_b3_release( [], [$stuff, $x, $y] );
-#
-# called when the right-button mouse is released on canvas.  this will
-# actually delete what's enclosed in the delete area.
-#
-sub _on_c_b3_release {
-    my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
-    my (undef, $x, $y) = @$args;
-    my $canvas = $h->{w}{canvas};
-
-    # find tags of elems selected.
-    my $items = $canvas->find('enclosed', $x, $y, @{ $h->{delpos} });
-    my %tags;
-    $tags{$_}++ for map { ($canvas->gettags($_))[0] } @$items;
-
-    # delete the items.
-    foreach my $tag ( keys %tags ) {
-        my ($n1, $n2) = split /-/, $tag;
-        $h->{graph}->delete_edge($n1, $n2);
-        $canvas->delete($tag);
+        if ( ! $n->connectable("-$dir2") ) {
+            warn "($col2,$row2) cannot be disconnected from ($pos) - $dir2\n";
+            return;
+        }
     }
 
-    # delete the delete rectangle.
-    $canvas->delete('delete-area');
+    # remove the connections
+    foreach my $dir ( @connections ) {
+        my ($dcol, $drow) = split /,/, _dir_coords($dir);
+        my $col2 = $col + $dcol;
+        my $row2 = $row + $drow;
+        my $n = $h->{nodes}{"$col2,$row2"};
+        $dcol = -$dcol;
+        $drow = -$drow;
+        my $dir2 = _dir_coords("$dcol,$drow");
+        $n->connect( "-$dir2" );
+        $n->draw( $h->{w}{canvas}, $TILELEN );
+    }
+
+    $node->delete( $h->{w}{canvas} );
+    delete $h->{nodes}{$pos};
 }
 
 
