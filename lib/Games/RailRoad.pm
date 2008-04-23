@@ -373,8 +373,7 @@ sub _on_c_b2_press {
     }
 
     # pick a random dir at first.
-    my $dirs = $h->{nodes}{$pos}->_next_map;
-    my @dirs = keys %$dirs;
+    my @dirs = $h->{nodes}{$pos}->connections;
     if ( scalar @dirs == 0 ) {
         warn "nowhere to move on\n";
         return;
