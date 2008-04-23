@@ -61,6 +61,20 @@ sub connectable {
 
 
 #
+# my @dirs = $node->connections;
+#
+# return a list of dirs in which the node is connected.
+#
+sub connections {
+    my ($self) = @_;
+    my $pkg = ref $self;
+    return () if $pkg eq 'Games::RailRoad::Node';
+    $pkg =~ s/^.*:://;
+    return map { lc $_ } split /_/, $pkg;
+}
+
+
+#
 # $node->delete( $canvas );
 #
 # request $node to delete itself from $canvas.
@@ -282,9 +296,17 @@ C<se>. Of course, other values are accepted but will return always
 false.
 
 
+
+=head2 my @dirs = $node->connections;
+
+Return a list of dirs in which the node is connected.
+
+
+
 =head2 $node->delete( $canvas );
 
 Request C<$node> to remove itself from C<$canvas>.
+
 
 
 =head2 $node->draw( $canvas, $tilelen );
