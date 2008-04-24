@@ -206,19 +206,24 @@ sub _on_tick {
     my $train = $h->{train};
     return unless defined $train;
 
+    # fetch current nodes for $train
+    my $from = $train->from;
+    my $to   = $train->to;
+    my $move = $from - $to;   # note it's from minus to
+    my $dir  = $move->as_dir;
+
+    # move the train 1/5 of rail further. of course, for diagonals we
+    # need to apply a cos(pi/4) factor (equals to sqrt(2)/2), otherwise
+    # the train would be moving faster in diagonals than in vertical /
+    # horizontal rails.
     my $frac = $train->frac;
-    $frac += 1/5;
+    $frac += $dir ~~ [ qw{ e n s w } ] ? 1/5 : sqrt(2)/10;
+
     if ( $frac >= 1 ) {
         # eh, changing node.
         $frac -= 1;
 
-        # fetch current nodes for $train
-        my $from = $train->from;
-        my $to   = $train->to;
-
         # get next direction (note it's from minus to)
-        my $move = $from - $to;
-        my $dir  = $move->as_dir;
         my $nextdir = $h->{nodes}{"$to"}->next_dir($dir);
         return unless defined $nextdir; # dead-end
 
@@ -528,8 +533,6 @@ limited to):
 =item * support for more than one train
 
 =item * adding coaches to trains
-
-=item * fixing speed change in diagonal rails
 
 =item * saving / loading to a file
 
