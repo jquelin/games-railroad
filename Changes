@@ -9,6 +9,10 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.03 Thu Apr 24 16:34:10 CEST 2008
+ - added missing prereq
+ - updated internal to use opaque vectors
+
 0.02 Wed Apr 23 17:41:23 CEST 2008
  - changed internals from Graph to home-made internals
  - forbidding impossible rails

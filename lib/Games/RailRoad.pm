@@ -21,7 +21,7 @@ use Tk::ToolBar;
 use POE;
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Readonly my $NBCOLS  => 60;
 Readonly my $NBROWS  => 40;
