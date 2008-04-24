@@ -15,7 +15,7 @@ use 5.010;
 use UNIVERSAL::require;
 
 use base qw{ Class::Accessor::Fast };
-__PACKAGE__->mk_accessors( qw{ col row } );
+__PACKAGE__->mk_accessors( qw{ position } );
 
 
 # -- PUBLIC METHODS
@@ -81,9 +81,8 @@ sub connections {
 #
 sub delete {
     my ($self, $canvas) = @_;
-    my $col = $self->col;
-    my $row = $self->row;
-    $canvas->delete("$col,$row");
+    my $pos = $self->position;
+    $canvas->delete("$pos");
 }
 
 #
@@ -140,36 +139,31 @@ sub switch {}
 sub _draw_segment {
     my ($self, $segment, $canvas, $tilelen) = @_;
 
-    my $col1 = $self->col;
-    my $row1 = $self->row;
+    my $pos  = $self->position;
+    my $col1 = $pos->x;
+    my $row1 = $pos->y;
     my ($col2, $row2) = ($col1, $row1);
 
-    # compute the end of the segment.
-    my ($endx, $endy);
-    given ($segment) {
-        # since each node is overlapping with the surrounding ones, we
-        # just need to draw half of the segments.
-        when('e' ) { $endx=+$tilelen; $endy=0;        $col2=$col1+1;                }
-        when('sw') { $endx=-$tilelen; $endy=$tilelen; $col2=$col1-1; $row2=$row1+1; }
-        when('s' ) { $endx=0;         $endy=$tilelen;                $row2=$row1+1; }
-        when('se') { $endx=+$tilelen; $endy=$tilelen; $col2=$col1+1; $row2=$row1+1; }
-        default    { return; }
-    }
+    # since each node is overlapping with the surrounding ones, we just
+    # need to draw half of the segments.
+    return unless $segment ~~ [ qw{ e sw s se } ];
+    my $move = Games::RailRoad::Vector->new_dir($segment);
+    my $end  = $pos + $move;
 
     # create the line.
-    my $x1 = $col1 * $tilelen;
-    my $y1 = $row1 * $tilelen;
-    my $x2 = $x1 + $endx;
-    my $y2 = $y1 + $endy;
-    my $tags = [ "$col1,$row1", "$col1,$row1-$col2,$row2" ];
-    $canvas->createLine( $x1, $y1, $x2, $y2, -tags=>$tags );
+    my $tags = [ "$pos", "$pos-$end" ];
+    $canvas->createLine(
+        $tilelen * $pos->x, $tilelen * $pos->y,
+        $tilelen * $end->x, $tilelen * $end->y,
+        -tags=>$tags
+    );
 
     # add some fancy drawing
     my $div    = 3;
     my $radius = 1;
     foreach my $i ( 0 .. $div ) {
-        my $x = $x1 + $endx * $i / $div;
-        my $y = $y1 + $endy * $i / $div;
+        my $x = $tilelen * ( $pos->x + $move->x * $i / $div );
+        my $y = $tilelen * ( $pos->y + $move->y * $i / $div );
         $canvas->createOval(
             $x-$radius, $y-$radius,
             $x+$radius, $y+$radius,

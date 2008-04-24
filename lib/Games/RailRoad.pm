@@ -14,6 +14,7 @@ use 5.010;
 
 use Games::RailRoad::Node;
 use Games::RailRoad::Train;
+use Games::RailRoad::Vector;
 use Readonly;
 use Tk; # should come before POE
 use Tk::ToolBar;
@@ -210,27 +211,21 @@ sub _on_tick {
     if ( $frac >= 1 ) {
         # eh, changing node.
         $frac -= 1;
+
+        # fetch current nodes for $train
         my $from = $train->from;
         my $to   = $train->to;
 
-        my ($fcol, $frow) = split /,/, $from;
-        my ($tcol, $trow) = split /,/, $to;
+        # get next direction (note it's from minus to)
+        my $move = $from - $to;
+        my $dir  = $move->as_dir;
+        my $nextdir = $h->{nodes}{"$to"}->next_dir($dir);
+        return unless defined $nextdir; # dead-end
 
-        my $dcol = $fcol-$tcol;
-        my $drow = $frow-$trow;
-        my $move = "$dcol,$drow";
-        my $dir  = _dir_coords($move);
-
-        my $next = $h->{nodes}{$to}->next_dir($dir);
-        return unless defined $next; # dead-end
-        $move = _dir_coords($next);
-        ($dcol, $drow) = split /,/, $move;
-
-        my ($col, $row) = split /,/, $to;
-        $col += $dcol;
-        $row += $drow;
-        $train->from($to);
-        $train->to("$col,$row");
+        # update current nodes for $train
+        my $vec = Games::RailRoad::Vector->new_dir($nextdir);
+        $train->from( $to );
+        $train->to( $to + $vec );
     }
 
     $train->frac($frac);
@@ -261,9 +256,9 @@ sub _on_c_b1_dblclick {
     my (undef, $x, $y) = @$args;
 
     # resolve column & row.
-    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
-    my $node = $h->{nodes}{$pos};
-    return unless defined($node);
+    my $vec = _resolve_coords($x,$y,0.5);
+    my $node = $h->{nodes}{"$vec"};
+    return unless defined $node;
 
     # switch the exits.
     $node->switch;
@@ -281,36 +276,32 @@ sub _on_c_b1_motion {
     my (undef, $x, $y) = @$args;
 
     # resolve column & row.
-    my ($newpos, $newcol, $newrow) = _resolve_coords($x,$y,2/5);
-    my ($oldpos, $oldcol, $oldrow) = @{ $h->{position} };
+    my $newvec = _resolve_coords($x,$y,2/5);
+    my $oldvec = $h->{position};
 
     # basic checks.
-    return unless defined $newpos;                     # new position is undef
-    return if defined($oldpos) && $oldpos eq $newpos;  # we did not move
+    return unless defined $newvec;                     # new position is undef
+    return if defined($oldvec) && $oldvec == $newvec;  # we did not move
 
     # we moved: store new position & create new node.
-    $h->{position} = [$newpos, $newcol, $newrow];
-    if ( not exists $h->{nodes}{$newpos} ) {
-        my $n = Games::RailRoad::Node->new({col=>$newcol,row=>$newrow});
-        $h->{nodes}{$newpos} = $n;
-    }
-    my $newnode = $h->{nodes}{$newpos};
+    $h->{position} = $newvec;
+    $h->{nodes}{"$newvec"} = Games::RailRoad::Node->new({position=>$newvec})
+        unless exists $h->{nodes}{"$newvec"};
+    my $newnode = $h->{nodes}{"$newvec"};
 
     # try to resolve old position.
-    return unless defined $oldpos;
-    my $oldnode = $h->{nodes}{$oldpos};
+    return unless defined $oldvec;
+    my $oldnode = $h->{nodes}{"$oldvec"};
 
     # check if the move is a single segment.
-    my $movex = $newcol - $oldcol;
-    my $movey = $newrow - $oldrow;
-    my $newmove = join ',',  $movex,  $movey;
-    my $oldmove = join ',', -$movex, -$movey;
-    my $newdir = _dir_coords( $newmove );
-    my $olddir = _dir_coords( $oldmove );
+    my $move   = $newvec - $oldvec;
+    my $newdir = $move->as_dir;
     if ( not defined $newdir ) {
-        warn "cannot move according to ($newmove)\n";
+        warn "cannot move according to $move\n";
         return;
     }
+    $move      = -$move;
+    my $olddir = $move->as_dir;
 
     # check if we can morph the nodes with this move.
     return unless $oldnode->connectable($newdir)
@@ -334,16 +325,16 @@ sub _on_c_b1_press {
     my (undef, $x, $y) = @$args;
 
     # resolve column & row.
-    my ($pos, $col, $row) = _resolve_coords($x,$y,2/5);
+    my $vec = _resolve_coords($x,$y,2/5);
 
     # store current position - even undef.
-    $h->{position} = [$pos, $col, $row];
+    $h->{position} = $vec;
 
     # create the node if possible.
-    return unless defined $pos;
-    return if defined $h->{nodes}{$pos};
-    my $node = Games::RailRoad::Node->new({col=>$col,row=>$row});
-    $h->{nodes}{$pos} = $node;
+    return unless defined $vec;
+    return if defined $h->{nodes}{"$vec"};
+    my $node = Games::RailRoad::Node->new({position=>$vec});
+    $h->{nodes}{"$vec"} = $node;
 }
 
 
@@ -359,31 +350,27 @@ sub _on_c_b2_press {
 
     return if defined $h->{train}; # only one train
 
-    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
+    my $vec = _resolve_coords($x,$y,0.5);
 
-    # check if there's a rail at $pos.
-    if ( not exists $h->{nodes}{$pos} ) {
-        warn "no rail at ($pos)\n";
+    # check if there's a rail at $vec.
+    if ( not exists $h->{nodes}{"$vec"} ) {
+        warn "no rail at $vec\n";
         return;
     }
 
     # pick a random dir at first.
-    my @dirs = $h->{nodes}{$pos}->connections;
+    my @dirs = $h->{nodes}{"$vec"}->connections;
     if ( scalar @dirs == 0 ) {
         warn "nowhere to move on\n";
         return;
     }
     my $dir  = $dirs[ rand @dirs ];
-    my $move = _dir_coords($dir);
-    my ($dcol, $drow) = split /,/, $move;
-    $col += $dcol;
-    $row += $drow;
-    my $to = "$col,$row";
+    my $move = Games::RailRoad::Vector->new_dir($dir);
 
     # create the train.
     $h->{train} = Games::RailRoad::Train->new( {
-        from => $pos,
-        to   => $to,
+        from => $vec,
+        to   => $vec + $move,
         frac => 0,
     } );
     $h->{train}->draw( $h->{w}{canvas}, $TILELEN );
@@ -399,70 +386,43 @@ sub _on_c_b2_press {
 sub _on_c_b3_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
-    my ($pos, $col, $row) = _resolve_coords($x,$y,0.5);
+    my $vec = _resolve_coords($x,$y,0.5);
 
-    my $node = $h->{nodes}{$pos};
+    my $node = $h->{nodes}{"$vec"};
     return unless defined $node;
 
     # check if we can remove connection
     my @connections = sort $node->connections;
     foreach my $dir ( @connections ) {
-        my ($dcol, $drow) = split /,/, _dir_coords($dir);
-        my $col2 = $col + $dcol;
-        my $row2 = $row + $drow;
-        my $n = $h->{nodes}{"$col2,$row2"};
-        $dcol = -$dcol;
-        $drow = -$drow;
-        my $dir2 = _dir_coords("$dcol,$drow");
+        my $move = Games::RailRoad::Vector->new_dir($dir);
+        my $v2 = $vec + $move;
+        my $n = $h->{nodes}{"$v2"};
 
+        $move = -$move;
+        my $dir2 = $move->as_dir;
         if ( ! $n->connectable("-$dir2") ) {
-            warn "($col2,$row2) cannot be disconnected from ($pos) - $dir2\n";
+            warn "$v2 cannot be disconnected from ($vec) using -$dir2\n";
             return;
         }
     }
 
     # remove the connections
     foreach my $dir ( @connections ) {
-        my ($dcol, $drow) = split /,/, _dir_coords($dir);
-        my $col2 = $col + $dcol;
-        my $row2 = $row + $drow;
-        my $n = $h->{nodes}{"$col2,$row2"};
-        $dcol = -$dcol;
-        $drow = -$drow;
-        my $dir2 = _dir_coords("$dcol,$drow");
+        my $move = Games::RailRoad::Vector->new_dir($dir);
+        my $v2 = $vec + $move;
+        my $n = $h->{nodes}{"$v2"};
+        $move = -$move;
+        my $dir2 = $move->as_dir;
         $n->connect( "-$dir2" );
         $n->draw( $h->{w}{canvas}, $TILELEN );
     }
 
     $node->delete( $h->{w}{canvas} );
-    delete $h->{nodes}{$pos};
+    delete $h->{nodes}{"$vec"};
 }
 
 
 # -- PRIVATE SUBS
-
-#
-# my $coords = _dir_coords( $dir );
-# my $dir    = _dir_coords( $coords );
-#
-# given a direction ('n', 'se', etc.) or some coords ('1,-1', '0,1',
-# etc.), return the corresponding coords or (resp.) dir.
-#
-sub _dir_coords {
-    my @dirs = (
-        '-1,-1' => 'nw',
-        '-1,0'  => 'w',
-        '-1,1'  => 'sw',
-        '0,-1'  => 'n',
-        '0,1'   => 's',
-        '1,-1'  => 'ne',
-        '1,0'   => 'e',
-        '1,1'   => 'se',
-    );
-    my %dir = ( @dirs, reverse @dirs );
-    return $dir{ $_[0] };
-}
-
 
 #
 # my ($pos, $col, $row) = _resolve_coords($x, $y, $precision);
@@ -496,7 +456,7 @@ sub _resolve_coords {
         default { return; }                   # not precise enough
     }
 
-    return ("$col,$row", $col, $row);
+    return Games::RailRoad::Vector->new($col,$row);
 }
 
 

@@ -25,8 +25,8 @@ sub draw {
     my $frac = $self->frac;
 
     my $diag = 2;
-    my ($colf, $rowf) = split /,/, $from;
-    my ($colt, $rowt) = split /,/, $to;
+    my $colf = $from->x; my $rowf = $from->y;
+    my $colt =   $to->x; my $rowt =   $to->y;
     $canvas->delete("$self");
     my $x = ( $colf + ($colt-$colf) * $frac ) * $tilelen;
     my $y = ( $rowf + ($rowt-$rowf) * $frac ) * $tilelen;

@@ -12,7 +12,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Games::RailRoad; # FIXME
+use Games::RailRoad::Vector;
 use base qw{ Games::RailRoad::Node };
 __PACKAGE__->mk_accessors( qw{ _switch } );
 
@@ -22,18 +22,11 @@ sub draw {
     my ($self, $canvas, $tilelen) = @_;
     $self->SUPER::draw($canvas, $tilelen);
 
-    my $col = $self->col;
-    my $row = $self->row;
-    my $x = $col * $tilelen;
-    my $y = $row * $tilelen;
-    my $dir  = $self->_sw_exits->[ $self->_switch ];
-    my $move = Games::RailRoad::_dir_coords($dir); # FIXME
-    my ($dx,$dy) = split /,/, $move;
-
-    $dx *= $tilelen / 3;
-    $dy *= $tilelen / 3;
-    $x += $dx;
-    $y += $dy;
+    my $pos = $self->position;
+    my $dir = $self->_sw_exits->[ $self->_switch ];
+    my $vec = Games::RailRoad::Vector->new_dir($dir);
+    my $x = $tilelen * ( $pos->x + $vec->x / 3 );
+    my $y = $tilelen * ( $pos->y + $vec->y / 3 );
 
     # add some fancy drawing
     my $radius = 2;
@@ -41,7 +34,7 @@ sub draw {
         $x-$radius, $y-$radius,
         $x+$radius, $y+$radius,
         -outline => 'green',
-        -tags => [ "$col,$row" ],
+        -tags => [ "$pos" ],
     );
 
 }
