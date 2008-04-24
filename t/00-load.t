@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use Test::More tests => 49;
 
 require_ok( 'Games::RailRoad' );
 diag( "Testing Games::RailRoad $Games::RailRoad::VERSION Perl $], $^X" );
@@ -63,5 +63,6 @@ require_ok( 'Games::RailRoad::Node::Switch::N_S_SE' );
 require_ok( 'Games::RailRoad::Node::Switch::N_S_SW' );
 require_ok( 'Games::RailRoad::Node::Temp' );
 require_ok( 'Games::RailRoad::Train' );
+require_ok( 'Games::RailRoad::Vector' );
 
 exit;
