@@ -104,7 +104,7 @@ sub copy {
 #
 sub as_string {
 	my $self = shift;
-	return '(' . $self->x, . ',' . $self->y . ')';
+	return '(' . $self->x . ',' . $self->y . ')';
 }
 
 
