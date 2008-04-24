@@ -49,11 +49,12 @@ lib/Games/RailRoad/Node/Switch/NW_S_SE.pm
 lib/Games/RailRoad/Node/Switch/NW_SE_W.pm
 lib/Games/RailRoad/Node/Temp.pm
 lib/Games/RailRoad/Train.pm
+lib/Games/RailRoad/Vector.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
 t/00-load.t
-t/09-pod.t
 t/09-pod-coverage.t
+t/09-pod.t
