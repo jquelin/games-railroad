@@ -24,6 +24,7 @@ use overload
 	'neg' => \&_invert,
 	'+='  => \&_add_inplace,
     '-='  => \&_substract_inplace,
+    '<=>' => \&_compare,
 	'""'  => \&as_string;
 
 Readonly my %coords2dir => (
@@ -201,6 +202,23 @@ sub _substract_inplace {
 }
 
 
+#- comparison
+
+#
+# my $bool = $v1->_compare($v2);
+# my $bool = $v1 <=> $v2;
+#
+# Check whether the vectors both point at the same spot. Return 0 if they
+# do, 1 if they don't.
+#
+sub _compare {
+    my ($v1, $v2) = @_;
+    return 1 if $v1->x != $v2->x;
+    return 1 if $v1->y != $v2->y;
+    return 0;
+}
+
+
 1;
 __END__
 
@@ -295,6 +313,15 @@ GRV objects also supports inplace mathematical operations:
 
 effectively adds / substracts C<$v2> to / from C<$v1>, and stores the
 result back into C<$v1>.
+
+
+=head2 Comparison
+
+Finally, GRV objects can be tested for equality, ie whether two vectors
+both point at the same spot.
+
+    print "same"   if $v1 == $v2;
+    print "differ" if $v1 != $v2;
 
 
 
