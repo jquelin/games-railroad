@@ -25,6 +25,7 @@ my $builder = Module::Build->new
         'Test::More'            => 0,
         'Tk'                    => 0,
         'Tk::ToolBar'           => 0,
+        'UNIVERSAL::require'    => 0,
         'perl'                  => '5.010',
     },
     requires          => {
@@ -34,6 +35,7 @@ my $builder = Module::Build->new
         'Readonly'              => 0,
         'Tk'                    => 0,
         'Tk::ToolBar'           => 0,
+        'UNIVERSAL::require'    => 0,
         'perl'                  => '5.010',
     },
     recommends     => {

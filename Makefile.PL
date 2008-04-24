@@ -28,6 +28,7 @@ WriteMakefile(
         'Test::More'            => 0,
         'Tk'                    => 0,
         'Tk::ToolBar'           => 0,
+        'UNIVERSAL::require'    => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => [
