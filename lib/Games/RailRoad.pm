@@ -12,11 +12,14 @@ use strict;
 use warnings;
 use 5.010;
 
+use File::Basename;
+use File::Spec::Functions;
 use Games::RailRoad::Node;
 use Games::RailRoad::Train;
 use Games::RailRoad::Vector;
 use Readonly;
 use Tk; # should come before POE
+use Tk::PNG;
 use Tk::ToolBar;
 use POE;
 
@@ -81,6 +84,11 @@ sub _on_start {
     # prettyfying tk app.
     # see http://www.perltk.org/index.php?option=com_content&task=view&id=43&Itemid=37
     $poe_main_window->optionAdd('*BorderWidth' => 1);
+
+    # icon
+    my $path = catfile( dirname($INC{'Games/RailRoad/Node.pm'}), qw{ share icons main.png } );
+    my $image = $poe_main_window->Photo('-format'=>'png', -file=>$path);
+    $poe_main_window->iconimage($image);
 
     # menu
     $poe_main_window->optionAdd('*tearOff', 'false'); # no tear-off menus
