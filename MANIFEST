@@ -48,6 +48,7 @@ lib/Games/RailRoad/Node/Switch/NE_SW_W.pm
 lib/Games/RailRoad/Node/Switch/NW_S_SE.pm
 lib/Games/RailRoad/Node/Switch/NW_SE_W.pm
 lib/Games/RailRoad/Node/Temp.pm
+lib/Games/RailRoad/share/icons/main.png
 lib/Games/RailRoad/Train.pm
 lib/Games/RailRoad/Vector.pm
 LICENSE
