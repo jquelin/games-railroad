@@ -24,6 +24,7 @@ use Tk; # should come before POE
 use Tk::PNG;
 use Tk::ToolBar;
 use POE;
+use UNIVERSAL::require;
 use YAML qw{ DumpFile LoadFile };
 
 
@@ -111,6 +112,14 @@ sub _do_open {
     my ($h, $file) = @_[HEAP, ARG0];
     my $save = LoadFile($file);
     warn "uh, loading a file from the future\n" if $save->{version} > $VERSION;
+
+    # load node classes, to be able to bless loaded nodes.
+    use Module::Pluggable search_path => 'Games::RailRoad::Node', sub_name => 'nodes';
+    $_->require for __PACKAGE__->nodes;
+
+    # load nodes and draw them.
+    $h->{nodes} = $save->{nodes};
+    $_->draw($h->{w}{canvas}, $TILELEN) foreach values %{ $h->{nodes} };
 }
 
 
