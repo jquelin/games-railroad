@@ -91,63 +91,62 @@ sub _on_start {
     $poe_main_window->iconimage($image);
 
     # menu
-    $poe_main_window->optionAdd('*tearOff', 'false'); # no tear-off menus
-    my $menuitems = [
-        [ Cascade => '~File', -menuitems => [
-            [ Button => '~Open',
-                -command     => $s->postback('_b_open'),
-                -accelerator => 'ctrl+o',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('fileopen16'),
-                ],
-            [ Separator => '' ],
-            [ Button => '~Quit',
-                -command     => $s->postback('_b_quit'),
-                -accelerator => 'ctrl+q',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('actexit16'),
-                ],
-            ],
-        ],
-        [ Cascade => '~Run', -menuitems => [
-            [ Button => '~Restart',
-                -command     => $s->postback('_b_restart'),
-                -accelerator => 'R',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('playstart16'),
-                ],
-            [ Button => '~Pause',
-                -command     => $s->postback('_b_pause'),
-                -accelerator => 'p',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('playpause16'),
-                ],
-            [ Button => '~Next',
-                -command     => $s->postback('_b_next'),
-                -accelerator => 'n',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('nav1rightarrow16'),
-                ],
-            [ Button => '~Continue',
-                -command     => $s->postback('_b_continue'),
-                -accelerator => 'c',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('nav2rightarrow16'),
-                ],
-            [ Separator => '' ],
-            [ Button => '~Breakpoints',
-                -command     => $s->postback('_b_breakpoints'),
-                #-accelerator => 'c',
-                -compound    => 'left',
-                -image       => $poe_main_window->Photo('calbell16'),
-                ],
-            ],
-        ],
-    ];
-    my $menubar = $poe_main_window->Menu( -menuitems => $menuitems );
-    $poe_main_window->configure( -menu => $menubar );
-    $h->{w}{mnu_run} = $menubar->entrycget(1, '-menu');
-
+#    $poe_main_window->optionAdd('*tearOff', 'false'); # no tear-off menus
+#    my $menuitems = [
+#        [ Cascade => '~File', -menuitems => [
+#            [ Button => '~Open',
+#                -command     => $s->postback('_b_open'),
+#                -accelerator => 'ctrl+o',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('fileopen16'),
+#                ],
+#            [ Separator => '' ],
+#            [ Button => '~Quit',
+#                -command     => $s->postback('_b_quit'),
+#                -accelerator => 'ctrl+q',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('actexit16'),
+#                ],
+#            ],
+#        ],
+#        [ Cascade => '~Run', -menuitems => [
+#            [ Button => '~Restart',
+#                -command     => $s->postback('_b_restart'),
+#                -accelerator => 'R',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('playstart16'),
+#                ],
+#            [ Button => '~Pause',
+#                -command     => $s->postback('_b_pause'),
+#                -accelerator => 'p',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('playpause16'),
+#                ],
+#            [ Button => '~Next',
+#                -command     => $s->postback('_b_next'),
+#                -accelerator => 'n',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('nav1rightarrow16'),
+#                ],
+#            [ Button => '~Continue',
+#                -command     => $s->postback('_b_continue'),
+#                -accelerator => 'c',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('nav2rightarrow16'),
+#                ],
+#            [ Separator => '' ],
+#            [ Button => '~Breakpoints',
+#                -command     => $s->postback('_b_breakpoints'),
+#                #-accelerator => 'c',
+#                -compound    => 'left',
+#                -image       => $poe_main_window->Photo('calbell16'),
+#                ],
+#            ],
+#        ],
+#    ];
+#    my $menubar = $poe_main_window->Menu( -menuitems => $menuitems );
+#    $poe_main_window->configure( -menu => $menubar );
+#    $h->{w}{mnu_run} = $menubar->entrycget(1, '-menu');
 
     # toolbar
     my @tb = (
