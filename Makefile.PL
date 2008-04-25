@@ -27,6 +27,7 @@ WriteMakefile(
         'File::Path'            => 0,
         'File::Spec::Functions' => 0,
         'Getopt::Euclid'        => 0,
+        'Module::Pluggable'     => 0,
         'POE'                   => 0,
         'Readonly'              => 0,
         'Test::More'            => 0,
