@@ -259,10 +259,10 @@ sub _on_b_quit {
 
 
 #
-# _on_c_b1_dblclick( [], [$stuff, $x, $y] );
+# _c_b1_dblclick( [], [$stuff, $x, $y] );
 #
-# called when double-clicking left button. switch the node if possible
-# (Games::RailRoad::Node::Switch).
+# called when double-clicking left button on canvas. switch the node if
+# possible (Games::RailRoad::Node::Switch).
 #
 sub _on_c_b1_dblclick {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
@@ -280,9 +280,10 @@ sub _on_c_b1_dblclick {
 
 
 #
-# _on_c_b1_motion( [], [$stuff, $x, $y] );
+# _c_b1_motion( [], [$stuff, $x, $y] );
 #
 # called when the mouse is moving on canvas while button is down.
+# creates and link rails together.
 #
 sub _on_c_b1_motion {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
@@ -329,9 +330,10 @@ sub _on_c_b1_motion {
 
 
 #
-# _on_c_b1_press( [], [$stuff, $x, $y] );
+# _c_b1_press( [], [$stuff, $x, $y] );
 #
-# called when the button mouse is pressed on canvas.
+# called when the button mouse is pressed on canvas. register position
+# to create rail, to be dragged later on.
 #
 sub _on_c_b1_press {
     my ($k,$h, $args) = @_[KERNEL, HEAP, ARG1];
@@ -352,7 +354,7 @@ sub _on_c_b1_press {
 
 
 #
-# _on_c_b2_press( [], [$stuff, $x, $y] );
+# _c_b2_press( [], [$stuff, $x, $y] );
 #
 # called when the right-button mouse is pressed on canvas. this will
 # place a new train.
@@ -391,7 +393,7 @@ sub _on_c_b2_press {
 
 
 #
-# _on_c_b3_press( [], [$stuff, $x, $y] );
+# _c_b3_press( [], [$stuff, $x, $y] );
 #
 # called when the right-button mouse is pressed on canvas. this will
 # mark the beginning corner of the delete area.
