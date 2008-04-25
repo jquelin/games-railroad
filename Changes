@@ -9,6 +9,11 @@ High-level changelog
 Low-level changelog
 ===================
 
+0.04 Fri Apr 25 17:28:42 CEST 2008
+ - ability to save / load game (nodes only)
+ - fixed unwanted speed change in diagonal rails
+ - icon for main window
+
 0.03 Thu Apr 24 16:34:10 CEST 2008
  - added missing prereq
  - updated internal to use opaque vectors

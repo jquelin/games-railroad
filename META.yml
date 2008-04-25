@@ -1,6 +1,6 @@
 ---
 name: Games-RailRoad
-version: 0.03
+version: 0.04
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: a train simulation game
@@ -9,22 +9,36 @@ resources:
   license: http://dev.perl.org/licenses/
 requires:
   Class::Accessor::Fast: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Path: 0
+  File::Spec::Functions: 0
   Getopt::Euclid: 0
+  Module::Pluggable: 0
   POE: 0
   Readonly: 0
   Tk: 0
+  Tk::PNG: 0
   Tk::ToolBar: 0
   UNIVERSAL::require: 0
+  YAML: 0
   perl: 5.010
 build_requires:
   Class::Accessor::Fast: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Path: 0
+  File::Spec::Functions: 0
   Getopt::Euclid: 0
+  Module::Pluggable: 0
   POE: 0
   Readonly: 0
   Test::More: 0
   Tk: 0
+  Tk::PNG: 0
   Tk::ToolBar: 0
   UNIVERSAL::require: 0
+  YAML: 0
   perl: 5.010
 recommends:
   Test::Pod: 0
@@ -32,7 +46,7 @@ recommends:
 provides:
   Games::RailRoad:
     file: lib/Games/RailRoad.pm
-    version: 0.03
+    version: 0.04
   Games::RailRoad::Node:
     file: lib/Games/RailRoad/Node.pm
   Games::RailRoad::Node::Cross:
