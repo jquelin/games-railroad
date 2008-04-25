@@ -54,10 +54,12 @@ sub spawn {
     my $session = POE::Session->create(
         inline_states => {
             # special poe events
-            _start           => \&_on_start,
+            _start           => \&_do_start,
             # public events
             # private events
-            _tick            => \&_on_tick,
+            _new             => \&_do_new,
+            _save            => \&_do_save,
+            _tick            => \&_do_tick,
             # gui events
             _b_new           => \&_on_b_new,
             _b_quit          => \&_on_b_quit,
@@ -80,11 +82,47 @@ sub spawn {
 # -- PRIVATE EVENTS
 
 #
-# _on_start( \%opts );
+# _new();
+#
+# reinits the various params to start anew.
+#
+sub _do_new {
+    my $h = $_[HEAP];
+
+    # various heap initialization.
+    $h->{nodes} = {};
+    $h->{train} = undef;
+
+    # clear the canvas.
+    my $canvas = $h->{w}{canvas};
+    $canvas->delete('all');
+    $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
+}
+
+#
+# _save($file);
+#
+# save the current game to $file.
+#
+sub _do_save {
+    my ($h, $file) = @_[HEAP, ARG0];
+    return unless defined $file;
+
+    # select what to save.
+    my $save = {
+        version => $VERSION,    # one never knows
+        nodes   => $h->{nodes},
+    };
+    DumpFile($file, $save);
+}
+
+
+#
+# _do_start( \%opts );
 #
 # session initialization. %opts is received from spawn();
 #
-sub _on_start {
+sub _do_start {
     my ($k, $h, $s, $opts) = @_[ KERNEL, HEAP, SESSION, ARG0 ];
 
     #-- create gui
@@ -161,7 +199,7 @@ sub _on_start {
         [ 'Button', 'actexit16',        'quit',        '<Control-q>', '_b_quit' ],
         [ 'separator' ],
         [ 'Button', 'filenew16',        'new',         '<Control-n>', '_b_new' ],
-        #[ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
+        [ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
         [ 'Button', 'filesave16',       'save',        '<Control-s>', '_b_save' ],
         #[ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
         #[ 'separator' ],
@@ -206,12 +244,12 @@ sub _on_start {
 
 
     #-- finish initialization
-    $k->yield( '_b_new' );
+    $k->yield( '_new' );
     $k->delay_set( '_tick', $TICK );
 }
 
 
-sub _on_tick {
+sub _do_tick {
     my ($k, $h) = @_[KERNEL, HEAP];
 
     $k->delay_set( '_tick', $TICK );
@@ -259,18 +297,8 @@ sub _on_tick {
 # called when the user wants to begin a new game.
 #
 sub _on_b_new {
-    my ($k, $h) = @_[KERNEL, HEAP];
-
-    # various heap initialization.
-    $h->{nodes} = {};
-    $h->{train} = undef;
-
-    # clear the canvas.
-    my $canvas = $h->{w}{canvas};
-    $canvas->delete('all');
-    $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
+    $_[KERNEL]->yield('_new');
 }
-
 
 #
 # _b_quit();
@@ -288,8 +316,6 @@ sub _on_b_quit {
 # called when the user wants to save the current game.
 #
 sub _on_b_save {
-    my ($k, $h, $args) = @_[KERNEL, HEAP, ARG1];
-
     # create savedir if needed.
     mkpath( $SAVEDIR );
 
@@ -307,12 +333,7 @@ sub _on_b_save {
     return unless defined $file;
     $file .= '.yaml' unless $file =~ /\.yaml$/;
 
-    # select what to save.
-    my $save = {
-        version => $VERSION,    # one never knows
-        nodes   => $h->{nodes},
-    };
-    DumpFile($file, $save);
+    $_[KERNEL]->yield('_save', $file);
 }
 
 
