@@ -13,6 +13,8 @@ use warnings;
 use 5.010;
 
 use File::Basename;
+use File::HomeDir;
+use File::Path;
 use File::Spec::Functions;
 use Games::RailRoad::Node;
 use Games::RailRoad::Train;
@@ -22,10 +24,14 @@ use Tk; # should come before POE
 use Tk::PNG;
 use Tk::ToolBar;
 use POE;
+use YAML;
 
 
 our $VERSION = '0.03';
 
+Readonly my $HOME    => File::HomeDir->my_home;
+Readonly my $GRHOME  => catfile( $HOME, qw{ .perl Games::RailRoad } );
+Readonly my $SAVEDIR => catfile( $GRHOME, 'savedir' );
 Readonly my $NBCOLS  => 60;
 Readonly my $NBROWS  => 40;
 Readonly my $TILELEN => 20;    # in pixels
@@ -54,6 +60,7 @@ sub spawn {
             _tick            => \&_on_tick,
             # gui events
             _b_quit          => \&_on_b_quit,
+            _b_save          => \&_on_b_save,
             _c_b1_dblclick   => \&_on_c_b1_dblclick,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
@@ -152,6 +159,7 @@ sub _on_start {
     my @tb = (
         [ 'Button', 'actexit16',        'quit',        '<Control-q>', '_b_quit' ],
         #[ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
+        [ 'Button', 'filesave16',       'save',        '<Control-s>', '_b_save' ],
         #[ 'separator' ],
         #[ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
         #[ 'separator' ],
@@ -254,6 +262,48 @@ sub _on_tick {
 #
 sub _on_b_quit {
     $poe_main_window->destroy;
+}
+
+
+#
+# _b_save();
+#
+# called when the user wants to save the current game.
+#
+sub _on_b_save {
+    my ($k, $h, $args) = @_[KERNEL, HEAP, ARG1];
+
+    # create savedir if needed.
+    mkpath( $SAVEDIR );
+
+    # prompt for save file - yes, i know, it freezes poe.
+    my $file = $poe_main_window->getSaveFile(
+        -defaultextension => '.yaml',
+		-filetypes        => [
+		    ['YAML files', '.yaml' ],
+		    ['All Files',  '*',    ],
+		],
+        -initialdir       => $SAVEDIR,
+        #-initialfile      => "getopenfile",
+        #-title            => "Your customized title",
+    );
+    return unless defined $file;
+    $file .= '.yaml' unless $file =~ /\.yaml$/;
+
+    #
+    my $fh;
+    if ( not open $fh, '>', $file ) {
+        warn "cannot open '$file': $!";
+        return;
+    }
+
+    # select what to save.
+    my $save = {
+        version => $VERSION,    # one never knows
+        nodes   => $h->{nodes},
+    };
+    print $fh Dump($save);
+    close $fh;
 }
 
 
