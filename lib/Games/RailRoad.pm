@@ -58,10 +58,12 @@ sub spawn {
             # public events
             # private events
             _new             => \&_do_new,
+            _open            => \&_do_open,
             _save            => \&_do_save,
             _tick            => \&_do_tick,
             # gui events
             _b_new           => \&_on_b_new,
+            _b_open          => \&_on_b_open,
             _b_quit          => \&_on_b_quit,
             _b_save          => \&_on_b_save,
             _c_b1_dblclick   => \&_on_c_b1_dblclick,
@@ -98,6 +100,19 @@ sub _do_new {
     $canvas->delete('all');
     $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
 }
+
+
+#
+# _open($file);
+#
+# load a game from $file.
+#
+sub _do_open {
+    my ($h, $file) = @_[HEAP, ARG0];
+    my $save = LoadFile($file);
+    warn "uh, loading a file from the future\n" if $save->{version} > $VERSION;
+}
+
 
 #
 # _save($file);
@@ -299,6 +314,37 @@ sub _do_tick {
 sub _on_b_new {
     $_[KERNEL]->yield('_new');
 }
+
+
+#
+# _b_open();
+#
+# called when the user wants to open a saved game.
+#
+sub _on_b_open {
+    my $k = $_[KERNEL];
+
+    # create savedir if needed.
+    mkpath( $SAVEDIR );
+
+    # prompt for save file - yes, i know, it freezes poe.
+    my $file = $poe_main_window->getOpenFile(
+        -defaultextension => '.yaml',
+		-filetypes        => [
+		    ['YAML files', '.yaml' ],
+		    ['All Files',  '*',    ],
+		],
+        -initialdir       => $SAVEDIR,
+        #-initialfile      => "getopenfile",
+        #-title            => "Your customized title",
+    );
+    return unless defined $file;
+
+    # reinit & open file.
+    $k->yield('_new');
+    $k->yield('_open', $file);
+}
+
 
 #
 # _b_quit();
