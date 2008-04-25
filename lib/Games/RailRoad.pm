@@ -24,7 +24,7 @@ use Tk; # should come before POE
 use Tk::PNG;
 use Tk::ToolBar;
 use POE;
-use YAML;
+use YAML qw{ DumpFile LoadFile };
 
 
 our $VERSION = '0.03';
@@ -307,20 +307,12 @@ sub _on_b_save {
     return unless defined $file;
     $file .= '.yaml' unless $file =~ /\.yaml$/;
 
-    #
-    my $fh;
-    if ( not open $fh, '>', $file ) {
-        warn "cannot open '$file': $!";
-        return;
-    }
-
     # select what to save.
     my $save = {
         version => $VERSION,    # one never knows
         nodes   => $h->{nodes},
     };
-    print $fh Dump($save);
-    close $fh;
+    DumpFile($file, $save);
 }
 
 
