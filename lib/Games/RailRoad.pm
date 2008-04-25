@@ -59,6 +59,7 @@ sub spawn {
             # private events
             _tick            => \&_on_tick,
             # gui events
+            _b_new           => \&_on_b_new,
             _b_quit          => \&_on_b_quit,
             _b_save          => \&_on_b_save,
             _c_b1_dblclick   => \&_on_c_b1_dblclick,
@@ -158,9 +159,10 @@ sub _on_start {
     # toolbar
     my @tb = (
         [ 'Button', 'actexit16',        'quit',        '<Control-q>', '_b_quit' ],
+        [ 'separator' ],
+        [ 'Button', 'filenew16',        'new',         '<Control-n>', '_b_new' ],
         #[ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
         [ 'Button', 'filesave16',       'save',        '<Control-s>', '_b_save' ],
-        #[ 'separator' ],
         #[ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
         #[ 'separator' ],
         #[ 'Button', 'playstart16',      'restart',     '<R>',         '_b_restart' ],
@@ -189,7 +191,6 @@ sub _on_start {
         -height     => $NBROWS * $TILELEN,
         #-browsecmd  => $s->postback('_tm_click'),
     )->pack(-side=>'left', -fill=>'both', -expand=>1);
-    $c->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
     $h->{w}{canvas} = $c;
 
     # binding canvas events.
@@ -203,13 +204,9 @@ sub _on_start {
     $c->CanvasBind($_ , [$s->postback($event{$_}), Ev('x'), Ev('y')] )
         foreach keys %event;
 
-    # -- various heap initializations
-    $h->{nodes} = {};
-    #$h->{graph} = Graph->new( undirected => 1 );
-    $h->{train} = undef;
-    #$k->yield( $opts->{file} ? ('_open_file', $opts->{file}) : '_b_open' );
 
-    #
+    #-- finish initialization
+    $k->yield( '_b_new' );
     $k->delay_set( '_tick', $TICK );
 }
 
@@ -254,6 +251,26 @@ sub _on_tick {
 
 
 # -- GUI EVENTS
+
+
+#
+# _b_new();
+#
+# called when the user wants to begin a new game.
+#
+sub _on_b_new {
+    my ($k, $h) = @_[KERNEL, HEAP];
+
+    # various heap initialization.
+    $h->{nodes} = {};
+    $h->{train} = undef;
+
+    # clear the canvas.
+    my $canvas = $h->{w}{canvas};
+    $canvas->delete('all');
+    $canvas->createGrid( 0, 0, $TILELEN, $TILELEN, -lines => 0 );
+}
+
 
 #
 # _b_quit();
