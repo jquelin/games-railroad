@@ -666,6 +666,8 @@ on the canvas.
 
 =item * changing switch exits by double-clicking on it.
 
+=item * saving / loading to a file
+
 =back
 
 
@@ -677,8 +679,6 @@ limited to):
 =item * support for more than one train
 
 =item * adding coaches to trains
-
-=item * saving / loading to a file
 
 =item * rc-file for the application
 
