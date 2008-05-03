@@ -1,6 +1,6 @@
 ---
 name: Games-RailRoad
-version: 0.04
+version: 1.00
 author:
   - 'Jerome Quelin <jquelin@cpan.org>'
 abstract: a train simulation game
@@ -46,7 +46,7 @@ recommends:
 provides:
   Games::RailRoad:
     file: lib/Games/RailRoad.pm
-    version: 0.04
+    version: 1.00
   Games::RailRoad::Node:
     file: lib/Games/RailRoad/Node.pm
   Games::RailRoad::Node::Cross:

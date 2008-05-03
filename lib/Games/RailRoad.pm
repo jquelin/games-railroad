@@ -28,7 +28,7 @@ use YAML qw{ DumpFile LoadFile };
 use POE;
 
 
-our $VERSION = '0.04';
+our $VERSION = '1.00';
 
 Readonly my $HOME    => File::HomeDir->my_home;
 Readonly my $GRHOME  => catfile( $HOME, qw{ .perl Games::RailRoad } );

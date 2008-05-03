@@ -3,11 +3,16 @@ Revision history for Games::RailRoad.
 High-level changelog
 ====================
 
+1.0x    polishing basic features
 0.0x    initial work, with basic capabilities
 
 
 Low-level changelog
 ===================
+
+1.00 Sat May  3 14:48:59 CEST 2008
+ - support for more than one train
+ - fix wrong rail exit for switch N_NW_S
 
 0.04 Fri Apr 25 17:28:42 CEST 2008
  - ability to save / load game (nodes only)
