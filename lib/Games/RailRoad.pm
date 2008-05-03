@@ -277,38 +277,38 @@ sub _do_tick {
     my ($k, $h) = @_[KERNEL, HEAP];
 
     $k->delay_set( '_tick', $TICK );
-    my $train = $h->{train};
-    return unless defined $train;
 
-    # fetch current nodes for $train
-    my $from = $train->from;
-    my $to   = $train->to;
-    my $move = $from - $to;   # note it's from minus to
-    my $dir  = $move->as_dir;
+    foreach my $train ( @{ $h->{train} } ) {
+        # fetch current nodes for $train
+        my $from = $train->from;
+        my $to   = $train->to;
+        my $move = $from - $to;   # note it's from minus to
+        my $dir  = $move->as_dir;
 
-    # move the train 1/5 of rail further. of course, for diagonals we
-    # need to apply a cos(pi/4) factor (equals to sqrt(2)/2), otherwise
-    # the train would be moving faster in diagonals than in vertical /
-    # horizontal rails.
-    my $frac = $train->frac;
-    $frac += $dir ~~ [ qw{ e n s w } ] ? 1/5 : sqrt(2)/10;
+        # move the train 1/5 of rail further. of course, for diagonals we
+        # need to apply a cos(pi/4) factor (equals to sqrt(2)/2), otherwise
+        # the train would be moving faster in diagonals than in vertical /
+        # horizontal rails.
+        my $frac = $train->frac;
+        $frac += $dir ~~ [ qw{ e n s w } ] ? 1/5 : sqrt(2)/10;
 
-    if ( $frac >= 1 ) {
-        # eh, changing node.
-        $frac -= 1;
+        if ( $frac >= 1 ) {
+            # eh, changing node.
+            $frac -= 1;
 
-        # get next direction (note it's from minus to)
-        my $nextdir = $h->{nodes}{"$to"}->next_dir($dir);
-        return unless defined $nextdir; # dead-end
+            # get next direction (note it's from minus to)
+            my $nextdir = $h->{nodes}{"$to"}->next_dir($dir);
+            next unless defined $nextdir; # dead-end
 
-        # update current nodes for $train
-        my $vec = Games::RailRoad::Vector->new_dir($nextdir);
-        $train->from( $to );
-        $train->to( $to + $vec );
+            # update current nodes for $train
+            my $vec = Games::RailRoad::Vector->new_dir($nextdir);
+            $train->from( $to );
+            $train->to( $to + $vec );
+        }
+
+        $train->frac($frac);
+        $train->draw( $h->{w}{canvas}, $TILELEN );
     }
-
-    $train->frac($frac);
-    $train->draw( $h->{w}{canvas}, $TILELEN );
 }
 
 
@@ -497,7 +497,7 @@ sub _on_c_b2_press {
     my ($h, $args) = @_[HEAP, ARG1];
     my (undef, $x, $y) = @$args;
 
-    return if defined $h->{train}; # only one train
+    #return if defined $h->{train}; # only one train
 
     my $vec = _resolve_coords($x,$y,0.5);
 
@@ -517,12 +517,15 @@ sub _on_c_b2_press {
     my $move = Games::RailRoad::Vector->new_dir($dir);
 
     # create the train.
-    $h->{train} = Games::RailRoad::Train->new( {
+    my $train = Games::RailRoad::Train->new( {
         from => $vec,
         to   => $vec + $move,
         frac => 0,
     } );
-    $h->{train}->draw( $h->{w}{canvas}, $TILELEN );
+    $train->draw( $h->{w}{canvas}, $TILELEN );
+
+    # store the train
+    push @{ $h->{train} }, $train;
 }
 
 
@@ -664,6 +667,8 @@ on the canvas.
 
 =item * placing a train on a rail by middle-clikcing on a rail on the canvas.
 
+=item * support for more than one train
+
 =item * changing switch exits by double-clicking on it.
 
 =item * saving / loading to a file
@@ -675,8 +680,6 @@ The amount of work needed is much more vast and includes (but not
 limited to):
 
 =over 4
-
-=item * support for more than one train
 
 =item * adding coaches to trains
 
