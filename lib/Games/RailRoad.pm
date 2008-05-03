@@ -93,8 +93,8 @@ sub _do_new {
     my $h = $_[HEAP];
 
     # various heap initialization.
-    $h->{nodes} = {};
-    $h->{train} = undef;
+    $h->{nodes}  = {};
+    $h->{trains} = [];
 
     # clear the canvas.
     my $canvas = $h->{w}{canvas};
@@ -120,6 +120,10 @@ sub _do_open {
     # load nodes and draw them.
     $h->{nodes} = $save->{nodes};
     $_->draw($h->{w}{canvas}, $TILELEN) foreach values %{ $h->{nodes} };
+
+    # load trains and draw them.
+    $h->{trains} = $save->{trains};
+    $_->draw($h->{w}{canvas}, $TILELEN) foreach values %{ $h->{train} };
 }
 
 
@@ -136,6 +140,7 @@ sub _do_save {
     my $save = {
         version => $VERSION,    # one never knows
         nodes   => $h->{nodes},
+        trains  => $h->{trains},
     };
     DumpFile($file, $save);
 }
@@ -278,7 +283,7 @@ sub _do_tick {
 
     $k->delay_set( '_tick', $TICK );
 
-    foreach my $train ( @{ $h->{train} } ) {
+    foreach my $train ( @{ $h->{trains} } ) {
         # fetch current nodes for $train
         my $from = $train->from;
         my $to   = $train->to;
@@ -525,7 +530,7 @@ sub _on_c_b2_press {
     $train->draw( $h->{w}{canvas}, $TILELEN );
 
     # store the train
-    push @{ $h->{train} }, $train;
+    push @{ $h->{trains} }, $train;
 }
 
 
