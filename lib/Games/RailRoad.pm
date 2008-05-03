@@ -595,13 +595,13 @@ sub _resolve_coords {
     $x %= $TILELEN;
     $y %= $TILELEN;
     given ($x) {
-        when( $_ > $TILELEN * (1-$prec) ) { $col++; }
-        when( $_ < $TILELEN * $prec     ) { } # nothing to do
+        when( $_ >  $TILELEN * (1-$prec) ) { $col++; }
+        when( $_ <= $TILELEN * $prec     ) { } # nothing to do
         default { return; }                   # not precise enough
     }
     given ($y) {
-        when( $_ > $TILELEN * (1-$prec) ) { $row++; }
-        when( $_ < $TILELEN * $prec     ) { } # nothing to do
+        when( $_ >  $TILELEN * (1-$prec) ) { $row++; }
+        when( $_ <= $TILELEN * $prec     ) { } # nothing to do
         default { return; }                   # not precise enough
     }
 
