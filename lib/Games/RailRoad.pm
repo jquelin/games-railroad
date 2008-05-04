@@ -40,6 +40,17 @@ Readonly my $TICK    => 0.050; # in seconds
 
 #Readonly my @COLORS => ( [255,0,0], [0,0,255], [0,255,0], [255,255,0], [255,0,255], [0,255,255] );
 
+our %img =
+    map { $_ => $poe_main_window->Photo(
+            -format => 'png',
+            -file   => catfile(
+                dirname($INC{'Games/RailRoad/Node.pm'}),
+                qw{ share icons },
+                "$_.png"
+            ),
+        )
+    } qw{ main train };
+
 
 # -- CONSTRUCTOR
 
@@ -161,9 +172,7 @@ sub _do_start {
     $poe_main_window->optionAdd('*BorderWidth' => 1);
 
     # icon
-    my $path = catfile( dirname($INC{'Games/RailRoad/Node.pm'}), qw{ share icons main.png } );
-    my $image = $poe_main_window->Photo('-format'=>'png', -file=>$path);
-    $poe_main_window->iconimage($image);
+    $poe_main_window->iconimage($img{main});
 
     # menu
 #    $poe_main_window->optionAdd('*tearOff', 'false'); # no tear-off menus
