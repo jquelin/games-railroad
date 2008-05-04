@@ -19,6 +19,7 @@ use File::Spec::Functions;
 use Games::RailRoad::Node;
 use Games::RailRoad::Train;
 use Games::RailRoad::Vector;
+use Games::RailRoad::Window::Trains;
 use Readonly;
 use Tk; # should come before POE
 use Tk::PNG;
@@ -78,6 +79,7 @@ sub spawn {
             _b_open          => \&_on_b_open,
             _b_quit          => \&_on_b_quit,
             _b_save          => \&_on_b_save,
+            _b_trains        => \&_on_b_trains,
             _c_b1_dblclick   => \&_on_c_b1_dblclick,
             _c_b1_motion     => \&_on_c_b1_motion,
             _c_b1_press      => \&_on_c_b1_press,
@@ -239,6 +241,8 @@ sub _do_start {
         [ 'Button', 'filenew16',        'new',         '<Control-n>', '_b_new' ],
         [ 'Button', 'fileopen16',       'open',        '<Control-o>', '_b_open' ],
         [ 'Button', 'filesave16',       'save',        '<Control-s>', '_b_save' ],
+        [ 'separator' ],
+        [ 'Button', $img{train},        'trains',      '<F5>',        '_b_trains' ],
         #[ 'Button', 'calbell16',        'breakpoints', '<F8>',        '_b_breakpoints' ],
         #[ 'separator' ],
         #[ 'Button', 'playstart16',      'restart',     '<R>',         '_b_restart' ],
@@ -403,6 +407,22 @@ sub _on_b_save {
     $file .= '.yaml' unless $file =~ /\.yaml$/;
 
     $_[KERNEL]->yield('_save', $file);
+}
+
+
+#
+# _b_trains();
+#
+# called when the user wants to show/hide trains window.
+#
+sub _on_b_trains {
+    my ($k, $h) = @_[KERNEL, HEAP];
+
+    return $k->post($h->{w}{trains}, 'visibility_toggle')
+        if exists $h->{w}{trains};
+
+    my $id = Games::RailRoad::Window::Trains->spawn(parent=>$poe_main_window);
+    $h->{w}{trains} = $id;
 }
 
 
