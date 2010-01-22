@@ -718,25 +718,23 @@ limited to):
 
 
 
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<< < games-railroad at
-rt.cpan.org> >>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Games-RailRoad>.  I
-will be notified, and then you'll automatically be notified of progress
-on your bug as I make changes.
-
-
-
 =head1 SEE ALSO
 
-L<POE>, L<Tk>.
-
-
-You can also look for information on this module at:
+You can find more information on this module at:
 
 =over 4
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Games-RailRoad>
+
+=item * See open / report bugs
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-RailRoad>
+
+=item * Git repository
+
+L<http://github.com/jquelin/games-railroad>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -745,10 +743,6 @@ L<http://annocpan.org/dist/Games-RailRoad>
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Games-RailRoad>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-RailRoad>
 
 =back
 
