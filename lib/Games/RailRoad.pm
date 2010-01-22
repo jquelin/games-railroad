@@ -5,23 +5,25 @@ use warnings;
 package Games::RailRoad;
 # ABSTRACT: a train simulation game
 
+use POE::Kernel { loop => 'Tk' }; # should come first
+
 use File::Basename;
 use File::HomeDir;
 use File::Path;
 use File::ShareDir qw{ dist_dir };
 use File::Spec::Functions;
-use Games::RailRoad::Node;
-use Games::RailRoad::Train;
-use Games::RailRoad::Vector;
-use Games::RailRoad::Window::Trains;
+use POE;
 use Readonly;
-use Tk; # should come before POE
+use Tk;
 use Tk::PNG;
 use Tk::ToolBar;
 use UNIVERSAL::require;
 use YAML qw{ DumpFile LoadFile };
-use POE;
 
+use Games::RailRoad::Node;
+use Games::RailRoad::Train;
+use Games::RailRoad::Vector;
+use Games::RailRoad::Window::Trains;
 
 Readonly my $HOME    => File::HomeDir->my_home;
 Readonly my $GRHOME  => catfile( $HOME, qw{ .perl Games::RailRoad } );
