@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Switch::E_NW_SE;
-# ABSTRACT: a node object
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Switch::E_NW_SE;
+# ABSTRACT: a node object
 
 use base qw{ Games::RailRoad::Node::Switch };
 

@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Straight;
-# ABSTRACT: a node object with two branches
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Straight;
+# ABSTRACT: a node object with two branches
 
 use base qw{ Games::RailRoad::Node };
 

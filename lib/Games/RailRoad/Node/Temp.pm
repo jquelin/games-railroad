@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Temp;
-# ABSTRACT: a node object not finished
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Temp;
+# ABSTRACT: a node object not finished
 
 use base qw{ Games::RailRoad::Node };
 

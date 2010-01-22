@@ -1,9 +1,9 @@
-package Games::RailRoad;
-# ABSTRACT: a train simulation game
-
+use 5.010;
 use strict;
 use warnings;
-use 5.010;
+
+package Games::RailRoad;
+# ABSTRACT: a train simulation game
 
 use File::Basename;
 use File::HomeDir;

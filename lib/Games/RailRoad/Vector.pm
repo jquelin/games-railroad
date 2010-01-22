@@ -1,9 +1,9 @@
-package Games::RailRoad::Vector;
-# ABSTRACT: an opaque vector class.
-
+use 5.010;
 use strict;
 use warnings;
-use integer;
+
+package Games::RailRoad::Vector;
+# ABSTRACT: an opaque vector class.
 
 use Readonly;
 use base qw{ Class::Accessor::Fast };

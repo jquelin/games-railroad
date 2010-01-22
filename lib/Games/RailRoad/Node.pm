@@ -1,9 +1,9 @@
-package Games::RailRoad::Node;
-# ABSTRACT: a node object
-
+use 5.010;
 use strict;
 use warnings;
-use 5.010;
+
+package Games::RailRoad::Node;
+# ABSTRACT: a node object
 
 use UNIVERSAL::require;
 

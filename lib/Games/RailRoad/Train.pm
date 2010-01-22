@@ -1,9 +1,9 @@
-package Games::RailRoad::Train;
-# ABSTRACT: a train object
-
+use 5.010;
 use strict;
 use warnings;
-use 5.010;
+
+package Games::RailRoad::Train;
+# ABSTRACT: a train object
 
 use base qw{ Class::Accessor::Fast };
 __PACKAGE__->mk_accessors( qw{ from to frac } );

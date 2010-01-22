@@ -1,8 +1,9 @@
-package Games::RailRoad::Window::Trains;
-# ABSTRACT: an opaque vector class.
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Window::Trains;
+# ABSTRACT: an opaque vector class.
 
 use Tk; # should come before POE
 use POE;

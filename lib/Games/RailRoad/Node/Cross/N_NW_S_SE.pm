@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Cross::N_NW_S_SE;
-# ABSTRACT: a node object
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Cross::N_NW_S_SE;
+# ABSTRACT: a node object
 
 use base qw{ Games::RailRoad::Node::Cross };
 

@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Half;
-# ABSTRACT: a node object with one branch
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Half;
+# ABSTRACT: a node object with one branch
 
 use base qw{ Games::RailRoad::Node };
 

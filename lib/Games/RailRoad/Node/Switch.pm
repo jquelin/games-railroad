@@ -1,9 +1,9 @@
-package Games::RailRoad::Node::Switch;
-# ABSTRACT: a node object with three branches
-
+use 5.010;
 use strict;
 use warnings;
-use 5.010;
+
+package Games::RailRoad::Node::Switch;
+# ABSTRACT: a node object with three branches
 
 use Games::RailRoad::Vector;
 use base qw{ Games::RailRoad::Node };

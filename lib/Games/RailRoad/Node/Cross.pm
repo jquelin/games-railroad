@@ -1,8 +1,9 @@
-package Games::RailRoad::Node::Cross;
-# ABSTRACT: a node object with 4 branches
-
+use 5.010;
 use strict;
 use warnings;
+
+package Games::RailRoad::Node::Cross;
+# ABSTRACT: a node object with 4 branches
 
 use base qw{ Games::RailRoad::Node };
 
