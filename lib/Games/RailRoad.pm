@@ -752,21 +752,3 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Games-RailRoad>
 
 =back
 
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin at cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2008 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-
-=cut
-

@@ -84,26 +84,3 @@ Request C<$train> to draw itself on C<$canvas>, assuming that each square
 has a length of C<$tilelen>.
 
 
-
-=head1 SEE ALSO
-
-L<Games::RailRoad>.
-
-
-
-=head1 AUTHOR
-
-Jerome Quelin, C<< <jquelin at cpan.org> >>
-
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2008 Jerome Quelin, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-
-=cut
-
