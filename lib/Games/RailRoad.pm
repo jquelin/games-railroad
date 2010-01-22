@@ -8,6 +8,7 @@ package Games::RailRoad;
 use File::Basename;
 use File::HomeDir;
 use File::Path;
+use File::ShareDir qw{ dist_dir };
 use File::Spec::Functions;
 use Games::RailRoad::Node;
 use Games::RailRoad::Train;
@@ -36,8 +37,8 @@ our %img =
     map { $_ => $poe_main_window->Photo(
             -format => 'png',
             -file   => catfile(
-                dirname($INC{'Games/RailRoad/Node.pm'}),
-                qw{ share icons },
+                dist_dir('Games-RailRoad'),
+                'icons',
                 "$_.png"
             ),
         )
