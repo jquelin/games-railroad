@@ -1,11 +1,3 @@
-#
-# This file is part of Games::RailRoad.
-# Copyright (c) 2008 Jerome Quelin, all rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the same terms as Perl itself.
-#
-
 package Games::RailRoad::Node::Switch::E_SE_W;
 
 use strict;
