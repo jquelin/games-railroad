@@ -17,7 +17,5 @@ __END__
 This package is a virtual class representing an unfinished node object -
 unfinished as in "there's clearly a branch missing".
 
-Refer to C<Games::RailRoad::Node> for a description of the various node
-types.
-
-
+Refer to L<Games::RailRoad::Node> for a description of the various
+node types.

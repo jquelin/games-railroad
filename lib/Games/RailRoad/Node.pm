@@ -197,31 +197,31 @@ __END__
 
 =head1 DESCRIPTION
 
-C<Games::RailRoad::Node> provides a node object. This is the base class
-for the following classes:
+This module provides a node object. This is the base class for the
+following classes:
 
 =over 4
 
 =item *
 
-C<Games::RailRoad::Node::Half> is a node with only one segment, from the
+L<Games::RailRoad::Node::Half> is a node with only one segment, from the
 center to one of the 8 extremities of a square.
 
 =item *
 
-C<Games::RailRoad::Node::Straight> is a node with two segments, linking
+L<Games::RailRoad::Node::Straight> is a node with two segments, linking
 two of the 8 extremities of a square.
 
 =item *
 
-C<Games::RailRoad::Node::Switch> is a node with three segments, linking
+L<Games::RailRoad::Node::Switch> is a node with three segments, linking
 three of the 8 extremities of a square through the center. The I<active>
 segment taken by a train riding this node can switch between two of the
 segments.
 
 =item *
 
-C<Games::RailRoad::Node::Cross> is a node with four segments: two
+L<Games::RailRoad::Node::Cross> is a node with four segments: two
 straight lines crossing in the center of the square.
 
 =back
@@ -230,7 +230,7 @@ straight lines crossing in the center of the square.
 Each of those classes also has subclasses, one for each configuration
 allowed. They are named after each of the existing extremity of the
 square linked (in uppercase), sorted and separated by underscore (C<_>).
-For example: C<Games::RailRoad::Node::Switch::N_S_SE>.
+For example: L<Games::RailRoad::Node::Switch::N_S_SE>.
 
 
 Note that each segment coming out of a node belongs to 2 different

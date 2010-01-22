@@ -58,7 +58,5 @@ The following methods are implemented in this class:
 
 =back
 
-Refer to C<Games::RailRoad::Node> for a description of the various node
+Refer to L<Games::RailRoad::Node> for a description of the various node
 types and methods.
-
-

@@ -41,7 +41,7 @@ __END__
 
 =head1 DESCRIPTION
 
-C<Games::RailRoad::Train> provides a train object.
+This class models a train object.
 
 
 

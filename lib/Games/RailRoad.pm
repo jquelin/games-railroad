@@ -648,7 +648,7 @@ __END__
 
 =head1 DESCRIPTION
 
-C<Games::RailRoad> allows you to draw a railroad, create some trains and
+L<Games::RailRoad> allows you to draw a railroad, create some trains and
 make them move on it. What you did when you were kid, but on your computer
 now.
 

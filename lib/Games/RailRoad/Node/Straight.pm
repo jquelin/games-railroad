@@ -17,6 +17,5 @@ __END__
 This package is a virtual class representing a node object with only
 two branches.
 
-Refer to C<Games::RailRoad::Node> for a description of the various node
-types.
-
+Refer to L<Games::RailRoad::Node> for a description of the various
+node types.

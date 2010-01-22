@@ -17,7 +17,5 @@ __END__
 This package is a virtual class representing a node object with four
 branches. This corresponds to 2 straight lines crossing each-other.
 
-Refer to C<Games::RailRoad::Node> for a description of the various node
-types.
-
-
+Refer to L<Games::RailRoad::Node> for a description of the various
+node types.

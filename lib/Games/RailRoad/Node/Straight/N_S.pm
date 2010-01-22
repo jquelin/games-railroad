@@ -38,7 +38,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This package provides a node object. Refer to C<Games::RailRoad::Node>
+This package provides a node object. Refer to L<Games::RailRoad::Node>
 for a description of the various node types.
 
 
@@ -46,7 +46,7 @@ for a description of the various node types.
 =head1 METHODS
 
 This class implements the following methods as defined in
-C<Games::RailRoad::Node>:
+L<Games::RailRoad::Node>:
 
 =over 4
 
@@ -56,6 +56,5 @@ C<Games::RailRoad::Node>:
 =back
 
 
-Refer to the documentation in C<Games::RailRoad::Node> to learn more
+Refer to the documentation in L<Games::RailRoad::Node> to learn more
 about them.
-
