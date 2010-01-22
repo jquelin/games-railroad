@@ -116,7 +116,8 @@ sub _do_new {
 sub _do_open {
     my ($h, $file) = @_[HEAP, ARG0];
     my $save = LoadFile($file);
-    warn "uh, loading a file from the future\n" if $save->{version} > $VERSION;
+    warn "uh, loading a file from the future\n"
+        if $save->{version} > __PACKAGE__->VERSION;
 
     # load node classes, to be able to bless loaded nodes.
     use Module::Pluggable search_path => 'Games::RailRoad::Node', sub_name => 'nodes';
@@ -143,7 +144,7 @@ sub _do_save {
 
     # select what to save.
     my $save = {
-        version => $VERSION,    # one never knows
+        version => __PACKAGE__->VERSION,    # one never knows
         nodes   => $h->{nodes},
         trains  => $h->{trains},
     };
