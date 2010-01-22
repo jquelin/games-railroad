@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Half;
+# ABSTRACT: a node object with one branch
 
 use strict;
 use warnings;
@@ -14,12 +15,6 @@ sub _next_map {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Half - a node object with one branch
-
 
 
 =head1 DESCRIPTION

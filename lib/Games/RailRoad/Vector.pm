@@ -1,4 +1,5 @@
 package Games::RailRoad::Vector;
+# ABSTRACT: an opaque vector class.
 
 use strict;
 use warnings;
@@ -212,11 +213,6 @@ sub _compare {
 
 1;
 __END__
-
-=head1 NAME
-
-Games::RailRoad::Vector - an opaque vector class.
-
 
 
 =head1 SYNOPSIS

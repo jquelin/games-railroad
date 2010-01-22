@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Cross::N_NE_S_SW;
+# ABSTRACT: a node object
 
 use strict;
 use warnings;
@@ -32,12 +33,6 @@ sub _transform_map {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Cross::N_NE_S_SW - a node object
-
 
 
 =head1 DESCRIPTION

@@ -1,4 +1,5 @@
 package Games::RailRoad::Window::Trains;
+# ABSTRACT: an opaque vector class.
 
 use strict;
 use warnings;
@@ -99,14 +100,7 @@ sub _on_start {
 
 
 1;
-
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Window::Trains - a window listing trains
-
 
 
 =head1 SYNOPSYS

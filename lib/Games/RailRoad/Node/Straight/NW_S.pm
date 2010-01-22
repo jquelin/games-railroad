@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Straight::NW_S;
+# ABSTRACT: a node object
 
 use strict;
 use warnings;
@@ -30,12 +31,6 @@ sub _transform_map {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Straight::NW_S - a node object
-
 
 
 =head1 DESCRIPTION

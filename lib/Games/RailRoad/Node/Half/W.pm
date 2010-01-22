@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Half::W;
+# ABSTRACT: a node object
 
 use strict;
 use warnings;
@@ -22,12 +23,6 @@ sub _transform_map {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Half::W - a node object
-
 
 
 =head1 DESCRIPTION

@@ -1,4 +1,5 @@
 package Games::RailRoad;
+# ABSTRACT: a train simulation game
 
 use strict;
 use warnings;
@@ -641,12 +642,6 @@ sub _resolve_coords {
 1;
 
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad - a train simulation game
-
 
 
 =head1 DESCRIPTION

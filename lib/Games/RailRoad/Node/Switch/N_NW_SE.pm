@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Switch::N_NW_SE;
+# ABSTRACT: a node object
 
 use strict;
 use warnings;
@@ -33,12 +34,6 @@ sub _transform_map {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Switch::N_NW_SE - a node object
-
 
 
 =head1 DESCRIPTION

@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Cross;
+# ABSTRACT: a node object with 4 branches
 
 use strict;
 use warnings;
@@ -8,12 +9,6 @@ use base qw{ Games::RailRoad::Node };
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Cross - a node object with 4 branches
-
 
 
 =head1 DESCRIPTION

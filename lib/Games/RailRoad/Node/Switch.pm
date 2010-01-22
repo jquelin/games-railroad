@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Switch;
+# ABSTRACT: a node object with three branches
 
 use strict;
 use warnings;
@@ -39,12 +40,6 @@ sub switch {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Switch - a node object with three branches
-
 
 
 =head1 DESCRIPTION

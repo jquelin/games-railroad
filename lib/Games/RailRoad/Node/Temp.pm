@@ -1,4 +1,5 @@
 package Games::RailRoad::Node::Temp;
+# ABSTRACT: a node object not finished
 
 use strict;
 use warnings;
@@ -8,12 +9,6 @@ use base qw{ Games::RailRoad::Node };
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Node::Temp - a node object not finished
-
 
 
 =head1 DESCRIPTION

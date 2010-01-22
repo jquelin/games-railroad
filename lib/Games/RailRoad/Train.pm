@@ -1,4 +1,5 @@
 package Games::RailRoad::Train;
+# ABSTRACT: a train object
 
 use strict;
 use warnings;
@@ -36,12 +37,6 @@ sub draw {
 
 1;
 __END__
-
-
-=head1 NAME
-
-Games::RailRoad::Train - a train object
-
 
 
 =head1 DESCRIPTION
