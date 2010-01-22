@@ -10,7 +10,6 @@ use lib "$Bin/../lib";
 
 use Getopt::Euclid;
 use Games::RailRoad;
-use POE;
 
 Games::RailRoad->spawn;
 POE::Kernel->run;
