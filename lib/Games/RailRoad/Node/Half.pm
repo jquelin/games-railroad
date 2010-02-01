@@ -5,18 +5,20 @@ use warnings;
 package Games::RailRoad::Node::Half;
 # ABSTRACT: a node object with one branch
 
-use base qw{ Games::RailRoad::Node };
+use Moose;
+extends qw{ Games::RailRoad::Node };
 
-# -- PRIVATE METHODS
+
+# -- private methods
 
 sub _next_map {
     return {};
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
-
 
 =head1 DESCRIPTION
 
