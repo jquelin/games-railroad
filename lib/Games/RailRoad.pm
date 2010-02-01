@@ -315,11 +315,11 @@ sub _do_tick {
 
             # update current nodes for $train
             my $vec = Games::RailRoad::Vector->new_dir($nextdir);
-            $train->from( $to );
-            $train->to( $to + $vec );
+            $train->set_from( $to );
+            $train->set_to( $to + $vec );
         }
 
-        $train->frac($frac);
+        $train->set_frac($frac);
         $train->draw( $h->{w}{canvas}, $TILELEN );
     }
 }

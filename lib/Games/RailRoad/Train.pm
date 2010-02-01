@@ -5,11 +5,55 @@ use warnings;
 package Games::RailRoad::Train;
 # ABSTRACT: a train object
 
-use base qw{ Class::Accessor::Fast };
-__PACKAGE__->mk_accessors( qw{ from to frac } );
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::SemiAffordanceAccessor;
+
+use Games::RailRoad::Types qw{ Num_0_1 };
 
 
-# -- PUBLIC METHODS
+# -- attributes
+
+=attr from
+
+The node from where the train is coming (a L<Games::RailRoad::Vector> object).
+
+=attr to
+
+The node where the train is headed (a L<Games::RailRoad::Vector> object).
+
+=attr frac
+
+A number between 0 and 1 indicating where exactly the train is between
+its from and to nodes.
+
+=cut
+
+has from => ( rw, isa=>'Games::RailRoad::Vector' );
+has to   => ( rw, isa=>'Games::RailRoad::Vector' );
+has frac => ( rw, isa=>Num_0_1 );
+
+
+# -- constructor & initializers
+
+=method my $train = Games::RailRoad::Train->new( \%opts );
+
+Create and return a new train object. One can pass a hash reference with
+the available attributes.
+
+=cut
+
+# provided by moose
+
+
+# -- public methods
+
+=method $train->draw( $canvas, $tilelen );
+
+Request C<$train> to draw itself on C<$canvas>, assuming that each square
+has a length of C<$tilelen>.
+
+=cut
 
 sub draw {
     my ($self, $canvas, $tilelen) = @_;
@@ -32,7 +76,7 @@ sub draw {
 }
 
 
-# -- PRIVATE METHODS
+# -- private methods
 
 
 1;
@@ -41,46 +85,4 @@ __END__
 
 =head1 DESCRIPTION
 
-This class models a train object.
-
-
-
-=head1 CONSTRUCTOR
-
-=head2 my $train = Games::RailRoad::Train->new( \%opts );
-
-Create a new train object. One can pass a hash reference with the
-following keys:
-
-
-=over 4
-
-
-=item from => $node
-
-the node from where the train is coming.
-
-
-=item to => $node
-
-the node where the train is headed.
-
-
-=item frac => $frac
-
-a number between 0 and 1 indicating where exactly the train is between
-its from and to nodes.
-
-
-=back
-
-
-
-=head1 PUBLIC METHODS
-
-=head2 $train->draw( $canvas, $tilelen );
-
-Request C<$train> to draw itself on C<$canvas>, assuming that each square
-has a length of C<$tilelen>.
-
-
+This class models a train object that moves on the rails.
