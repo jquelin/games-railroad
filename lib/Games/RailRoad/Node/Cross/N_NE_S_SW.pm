@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Games::RailRoad::Node::Cross::N_NE_S_SW;
-# ABSTRACT: a node object
+# ABSTRACT: a given type of node...
 
 use base qw{ Games::RailRoad::Node::Cross };
 
