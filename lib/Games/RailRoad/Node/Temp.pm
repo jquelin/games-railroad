@@ -5,12 +5,12 @@ use warnings;
 package Games::RailRoad::Node::Temp;
 # ABSTRACT: a node object not finished
 
-use base qw{ Games::RailRoad::Node };
+use Moose;
+extends qw{ Games::RailRoad::Node };
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
-
 
 =head1 DESCRIPTION
 
