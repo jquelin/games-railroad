@@ -10,15 +10,41 @@ use UNIVERSAL::require;
 use base qw{ Class::Accessor::Fast };
 __PACKAGE__->mk_accessors( qw{ position } );
 
+# -- attributes
 
-# -- PUBLIC METHODS
+=attr position
 
-#
-# $node->connect( $dir );
-#
-# connect the node to the node in the wanted $dir. return undef if it
-# isn't possible.
-#
+The node position (a L<Games::RailRoad::Vector>).
+
+=cut
+
+
+
+# -- constructor & initializers
+
+=method my $node = Games::RailRoad::Node->new( \%opts );
+
+Create a new node object. One can pass a hash reference with the
+available attributes.
+
+=cut
+
+# provided by moose
+
+
+# -- public methods
+
+=method $node->connect( $dir );
+
+Try to extend C<$node> in the wanted C<$dir>. Return undef if it isn't
+possible. In practice, note that the object will change of base class.
+
+C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
+C<se>. Of course, other values are accepted but won't result in a node
+extension.
+
+=cut
+
 sub connect {
     my ($self, $dir) = @_;
 
@@ -40,12 +66,17 @@ sub connect {
 }
 
 
-#
-# $node->connectable( $dir );
-#
-# return true if the node can be connected to the node in the wanted
-# $dir. return false otherwise.
-#
+=method $node->connectable( $dir );
+
+Return true if C<$node> can be connected to the wanted C<$dir>. Return
+false otherwise.
+
+C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
+C<se>. Of course, other values are accepted but will always return
+false.
+
+=cut
+
 sub connectable {
     my ($self, $dir) = @_;
     my $map = $self->_transform_map;
@@ -53,11 +84,12 @@ sub connectable {
 }
 
 
-#
-# my @dirs = $node->connections;
-#
-# return a list of dirs in which the node is connected.
-#
+=method my @dirs = $node->connections;
+
+Return a list of dirs in which the node is connected.
+
+=cut
+
 sub connections {
     my ($self) = @_;
     my $pkg = ref $self;
@@ -67,23 +99,27 @@ sub connections {
 }
 
 
-#
-# $node->delete( $canvas );
-#
-# request $node to delete itself from $canvas.
-#
+=method $node->delete( $canvas );
+
+Request C<$node> to remove itself from C<$canvas>.
+
+=cut
+
 sub delete {
     my ($self, $canvas) = @_;
     my $pos = $self->position;
     $canvas->delete("$pos");
 }
 
-#
-# $node->draw( $canvas, $tilelen );
-#
-# request $node to draw itself on $canvas, assuming that each
-# square has a length of $tilelen.
-#
+
+=method $node->draw( $canvas, $tilelen );
+
+Request C<$node> to draw itself on C<$canvas>, assuming that each square
+has a length of C<$tilelen>. Note that this method calls the C<delete()>
+method first.
+
+=cut
+
 sub draw {
     my ($self, $canvas, $tilelen) = @_;
     $self->delete($canvas);
@@ -96,31 +132,33 @@ sub draw {
 }
 
 
-#
-# my $to = $node->next_dir( $from );
-#
-# when $node is reached by a train, this method will return the next
-# direction to head to, assuming the train was coming from $from.
-#
-# can return undef if there's no such $from configured, or if the node
-# is a dead-end.
-#
+=method my $to = $node->next_dir( $from );
+
+When C<$node> is reached by a train, this method will return the next
+direction to head to, assuming the train was coming from C<$from>.
+
+Note that the method can return undef if there's no such C<$from>
+configured, or if the node is a dead-end.
+
+=cut
+
 sub next_dir {
     my ($self, $from) = @_;
     return $self->_next_map->{$from};
 }
 
 
-#
-# $node->switch;
-#
-# request a node to change its exit, if possible. this is a no-op for
-# most nodes, except games::railroad::node::switch::*
-#
+=method $node->switch;
+
+Request a node to change its exit, if possible. This is a no-op for most
+nodes, except C<Games::Railroad::Node::Switch::*>.
+
+=cut
+
 sub switch {}
 
 
-# -- PRIVATE METHODS
+# -- private methods
 
 #
 # $node->_draw_segment( $segment, $canvas, $tilelen )
@@ -232,92 +270,6 @@ allowed. They are named after each of the existing extremity of the
 square linked (in uppercase), sorted and separated by underscore (C<_>).
 For example: L<Games::RailRoad::Node::Switch::N_S_SE>.
 
-
 Note that each segment coming out of a node belongs to 2 different
 (adjacent) nodes.
-
-
-
-=head1 CONSTRUCTOR
-
-=head2 my $node = Games::RailRoad::Node->new( \%opts );
-
-Create a new node object. One can pass a hash reference with the
-following keys:
-
-=over 4
-
-=item col => $col
-
-the column of the canvas where the node is.
-
-=item row => $row
-
-the row of the canvas where the node is.
-
-
-=back
-
-
-
-=head1 PUBLIC METHODS
-
-=head2 $node->connect( $dir );
-
-Try to extend C<$node> in the wanted C<$dir>. Return undef if it isn't
-possible. In practice, note that the object will change of base class.
-
-C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
-C<se>. Of course, other values are accepted but won't result in a node
-extension.
-
-
-
-=head2 $node->connectable( $dir );
-
-Return true if C<$node> can be connected to the wanted C<$dir>. Return
-false otherwise.
-
-C<$dir> should be one of C<nw>, C<n>, C<ne>, C<w>, C<e>, C<sw>, C<s>,
-C<se>. Of course, other values are accepted but will return always
-false.
-
-
-
-=head2 my @dirs = $node->connections;
-
-Return a list of dirs in which the node is connected.
-
-
-
-=head2 $node->delete( $canvas );
-
-Request C<$node> to remove itself from C<$canvas>.
-
-
-
-=head2 $node->draw( $canvas, $tilelen );
-
-Request C<$node> to draw itself on C<$canvas>, assuming that each square
-has a length of C<$tilelen>. Note that this method calls the C<delete()>
-method first.
-
-
-
-=head2 my $to = $node->next_dir( $from );
-
-When C<$node> is reached by a train, this method will return the next
-direction to head to, assuming the train was coming from C<$from>.
-
-Note that the method can return undef if there's no such C<$from>
-configured, or if the node is a dead-end.
-
-
-
-=head2 $node->switch;
-
-Request a node to change its exit, if possible. This is a no-op for most
-nodes, except C<Games::Railroad::Node::Switch::*>.
-
-
 
