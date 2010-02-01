@@ -5,12 +5,12 @@ use warnings;
 package Games::RailRoad::Node::Straight;
 # ABSTRACT: a node object with two branches
 
-use base qw{ Games::RailRoad::Node };
+use Moose;
+extends qw{ Games::RailRoad::Node };
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
-
 
 =head1 DESCRIPTION
 
