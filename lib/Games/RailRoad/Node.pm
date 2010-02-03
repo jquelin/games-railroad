@@ -175,8 +175,8 @@ sub _draw_segment {
     my ($self, $segment, $canvas, $tilelen) = @_;
 
     my $pos  = $self->position;
-    my $col1 = $pos->x;
-    my $row1 = $pos->y;
+    my $col1 = $pos->posx;
+    my $row1 = $pos->posy;
     my ($col2, $row2) = ($col1, $row1);
 
     # since each node is overlapping with the surrounding ones, we just
@@ -188,8 +188,8 @@ sub _draw_segment {
     # create the line.
     my $tags = [ "$pos", "$pos-$end" ];
     $canvas->createLine(
-        $tilelen * $pos->x, $tilelen * $pos->y,
-        $tilelen * $end->x, $tilelen * $end->y,
+        $tilelen * $pos->posx, $tilelen * $pos->posy,
+        $tilelen * $end->posx, $tilelen * $end->posy,
         -tags=>$tags
     );
 
@@ -197,8 +197,8 @@ sub _draw_segment {
     my $div    = 3;
     my $radius = 1;
     foreach my $i ( 0 .. $div ) {
-        my $x = $tilelen * ( $pos->x + $move->x * $i / $div );
-        my $y = $tilelen * ( $pos->y + $move->y * $i / $div );
+        my $x = $tilelen * ( $pos->posx + $move->posx * $i / $div );
+        my $y = $tilelen * ( $pos->posy + $move->posy * $i / $div );
         $canvas->createOval(
             $x-$radius, $y-$radius,
             $x+$radius, $y+$radius,

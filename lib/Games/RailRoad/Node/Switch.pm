@@ -27,8 +27,8 @@ sub draw {
     my $pos = $self->position;
     my $dir = $self->_sw_exits->[ $self->_switch ];
     my $vec = Games::RailRoad::Vector->new_dir($dir);
-    my $x = $tilelen * ( $pos->x + $vec->x / 3 );
-    my $y = $tilelen * ( $pos->y + $vec->y / 3 );
+    my $x = $tilelen * ( $pos->posx + $vec->posx / 3 );
+    my $y = $tilelen * ( $pos->posy + $vec->posy / 3 );
 
     # add some fancy drawing
     my $radius = 2;

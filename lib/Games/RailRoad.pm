@@ -637,7 +637,7 @@ sub _resolve_coords {
         default { return; }                   # not precise enough
     }
 
-    return Games::RailRoad::Vector->new($col,$row);
+    return Games::RailRoad::Vector->new({posx=>$col, posy=>$row});
 }
 
 

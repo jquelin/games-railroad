@@ -5,9 +5,10 @@ use warnings;
 package Games::RailRoad::Vector;
 # ABSTRACT: an opaque vector class.
 
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::SemiAffordanceAccessor;
 use Readonly;
-use base qw{ Class::Accessor::Fast };
-__PACKAGE__->mk_accessors( qw{ x y } );
 
 use overload
     '='   => \&copy,
@@ -18,6 +19,26 @@ use overload
     '-='  => \&_substract_inplace,
     '<=>' => \&_compare,
     '""'  => \&as_string;
+
+
+
+# -- attributes
+
+=attr posx
+
+The x coordinate of the vector. Default to 0.
+
+=attr posy
+
+The y coordinate of the vector. Default to 0.
+
+=cut
+
+has posx => ( rw, isa=>'Int', default=>0 );
+has posy => ( rw, isa=>'Int', default=>0 );
+
+
+# -- private vars
 
 Readonly my %coords2dir => (
     '(-1,-1)' => 'nw',
@@ -39,45 +60,40 @@ Readonly my %dir2coords => (
     'e'  => [ 1, 0],
     'se' => [ 1, 1],
 );
- 
-
-# -- CONSTRUCTORS
-
-#
-# my $vec = GR::Vector->new( $x,$y );
-#
-# Create a new vector. The arguments are a couple of integer
-# representing the x and y coordinates.
-#
-sub new {
-    my $pkg = shift;
-
-    # regular GRV object
-    my $self = { x=>$_[0], y=>$_[1] };
-    bless $self, $pkg;
-    return $self;
-}
 
 
-#
-# my $vec = GR::Vector->new_dir( $dir );
-#
-# Create a new vector, from a given direction. The recognized directions
-# are C<e>, C<n>, C<ne>, C<nw>, C<s>, C<se>, C<sw>, C<w>.
-#
+# -- constructors & initializers
+
+=method my $vec = GR::Vector->new( \%params );
+
+Create and return a new vector. Accept a hash reference with the
+attribute values.
+
+=cut
+
+# provided by moose
+
+
+=method my $vec = GR::Vector->new_dir( $dir );
+
+Create a new vector, from a given direction. The recognized directions
+are C<e>, C<n>, C<ne>, C<nw>, C<s>, C<se>, C<sw>, C<w>.
+
+=cut
+
 sub new_dir {
     my ($pkg, $dir) = @_;
-
-    return $pkg->new( @{ $dir2coords{$dir} } );
+    my ($x, $y) = @{ $dir2coords{$dir} };
+    return $pkg->new( { posx=>$x, posy=>$y } );
 }
 
 
-#
-# my $vec = $v->copy;
-#
-# Return a new GRV object, which has the same dimensions and coordinates
-# as $v.
-#
+=method my $vec = $v->copy;
+
+Return a new GRV object, which has the same coordinates as C<$v>.
+
+=cut
+
 sub copy {
     my $vec = shift;
     return bless {%$vec}, ref $vec;
@@ -97,7 +113,7 @@ sub copy {
 #
 sub as_string {
     my $self = shift;
-    return '(' . $self->x . ',' . $self->y . ')';
+    return '(' . $self->posx . ',' . $self->posy . ')';
 }
 
 
@@ -125,9 +141,9 @@ sub as_dir {
 #
 sub _add {
     my ($v1, $v2) = @_;
-    my $rv = ref($v1)->new( {x=>0, y=>0} );
-    $rv->x( $v1->x + $v2->x );
-    $rv->y( $v1->y + $v2->y );
+    my $rv = ref($v1)->new;
+    $rv->set_posx( $v1->posx + $v2->posx );
+    $rv->set_posy( $v1->posy + $v2->posy );
     return $rv;
 }
 
@@ -140,9 +156,9 @@ sub _add {
 #
 sub _substract {
     my ($v1, $v2) = @_;
-    my $rv = ref($v1)->new( {x=>0, y=>0} );
-    $rv->x( $v1->x - $v2->x );
-    $rv->y( $v1->y - $v2->y );
+    my $rv = ref($v1)->new;
+    $rv->set_posx( $v1->posx - $v2->posx );
+    $rv->set_posy( $v1->posy - $v2->posy );
     return $rv;
 }
 
@@ -158,9 +174,9 @@ sub _substract {
 #
 sub _invert {
     my ($v1) = @_;
-    my $rv = ref($v1)->new( {x=>0, y=>0} );
-    $rv->x( - $v1->x );
-    $rv->y( - $v1->y );
+    my $rv = ref($v1)->new;
+    $rv->set_posx( - $v1->posx );
+    $rv->set_posy( - $v1->posy );
     return $rv;
 }
 
@@ -174,8 +190,8 @@ sub _invert {
 #
 sub _add_inplace {
     my ($v1, $v2) = @_;
-    $v1->x( $v1->x + $v2->x );
-    $v1->y( $v1->y + $v2->y );
+    $v1->set_posx( $v1->posx + $v2->posx );
+    $v1->set_posy( $v1->posy + $v2->posy );
     return $v1;
 }
 
@@ -188,8 +204,8 @@ sub _add_inplace {
 #
 sub _substract_inplace {
     my ($v1, $v2) = @_;
-    $v1->x( $v1->x - $v2->x );
-    $v1->y( $v1->y - $v2->y );
+    $v1->set_posx( $v1->posx - $v2->posx );
+    $v1->set_posy( $v1->posy - $v2->posy );
     return $v1;
 }
 
@@ -205,8 +221,8 @@ sub _substract_inplace {
 #
 sub _compare {
     my ($v1, $v2) = @_;
-    return 1 if $v1->x != $v2->x;
-    return 1 if $v1->y != $v2->y;
+    return 1 if $v1->posx != $v2->posx;
+    return 1 if $v1->posy != $v2->posy;
     return 0;
 }
 
@@ -217,7 +233,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    my $v1 = Games::RailRoad::Vector->new(...);
+    my $v1 = Games::RailRoad::Vector->new( \%params );
 
 
 
@@ -226,27 +242,6 @@ __END__
 This class abstracts basic vector manipulation. It lets you pass around
 one argument to your functions, do vector arithmetic and various string
 representation.
-
-
-
-=head1 CONSTRUCTORS
-
-=head2 my $vec = GR::Vector->new( $x, $y );
-
-Create a new vector. The arguments are the x and y coordinates.
-
-
-
-=head2 my $vec = GR::Vector->new_dir( $dir );
-
-Create a new vector, from a given direction. The recognized directions
-are C<e>, C<n>, C<ne>, C<nw>, C<s>, C<se>, C<sw>, C<w>.
-
-
-
-=head2 my $vec = $v->copy;
-
-Return a new GRV object, which has the same coordinates as $v.
 
 
 
