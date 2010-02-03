@@ -118,12 +118,34 @@ sub _do_new {
 sub _do_open {
     my ($h, $file) = @_[HEAP, ARG0];
     my $save = LoadFile($file);
-    warn "uh, loading a file from the future\n"
-        if $save->{version} > __PACKAGE__->VERSION;
 
     # load node classes, to be able to bless loaded nodes.
     use Module::Pluggable search_path => 'Games::RailRoad::Node', sub_name => 'nodes';
     $_->require for __PACKAGE__->nodes;
+
+    given ( $save->{version} ) {
+        when ( $_ > __PACKAGE__->VERSION ) {
+            die "uh, loading a file from the future\n"
+        }
+
+        when ( '1.00' ) {
+            warn "converting game saved in version 1.00\n";
+            foreach my $node ( values %{ $save->{nodes} } ) {
+                my $pos = $node->position;
+                $pos->set_posx( delete $pos->{x} );
+                $pos->set_posy( delete $pos->{y} );
+            }
+            foreach my $train ( @{ $save->{trains} } ) {
+                my $from = $train->from;
+                my $to   = $train->to;
+                $from->set_posx( delete $from->{x} );
+                $from->set_posy( delete $from->{y} );
+                $to->set_posx( delete $to->{x} );
+                $to->set_posy( delete $to->{y} );
+            }
+        }
+    }
+
 
     # load nodes and draw them.
     $h->{nodes} = $save->{nodes};
