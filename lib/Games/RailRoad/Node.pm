@@ -5,10 +5,11 @@ use warnings;
 package Games::RailRoad::Node;
 # ABSTRACT: a node object
 
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::SemiAffordanceAccessor;
 use UNIVERSAL::require;
 
-use base qw{ Class::Accessor::Fast };
-__PACKAGE__->mk_accessors( qw{ position } );
 
 # -- attributes
 
@@ -18,6 +19,7 @@ The node position (a L<Games::RailRoad::Vector>).
 
 =cut
 
+has position => ( ro, isa=>'Games::RailRoad::Vector', required );
 
 
 # -- constructor & initializers
@@ -144,6 +146,8 @@ configured, or if the node is a dead-end.
 
 sub next_dir {
     my ($self, $from) = @_;
+    # each node class is defining a _next_map() method that returns a
+    # hashref of {from=>to}
     return $self->_next_map->{$from};
 }
 
