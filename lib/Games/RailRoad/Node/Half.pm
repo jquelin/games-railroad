@@ -11,9 +11,7 @@ extends qw{ Games::RailRoad::Node };
 
 # -- private methods
 
-sub _next_map {
-    return {};
-}
+sub _next_map { return {}; }
 
 
 __PACKAGE__->meta->make_immutable;

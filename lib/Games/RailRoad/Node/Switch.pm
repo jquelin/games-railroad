@@ -5,11 +5,20 @@ use warnings;
 package Games::RailRoad::Node::Switch;
 # ABSTRACT: a node object with three branches
 
-use Games::RailRoad::Vector;
-use base qw{ Games::RailRoad::Node };
-__PACKAGE__->mk_accessors( qw{ _switch } );
+use Moose;
+use MooseX::Has::Sugar;
+use MooseX::SemiAffordanceAccessor;
 
-# -- PUBLIC METHODS
+extends qw{ Games::RailRoad::Node };
+
+use Games::RailRoad::Vector;
+
+
+# -- attributes
+has _switch => ( rw, isa=>'Int' );
+
+
+# -- public methods
 
 sub draw {
     my ($self, $canvas, $tilelen) = @_;
@@ -34,10 +43,11 @@ sub draw {
 
 sub switch {
     my ($self) = @_;
-    $self->_switch( ($self->_switch + 1) % 2 );
+    $self->_set_switch( ($self->_switch + 1) % 2 );
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
 

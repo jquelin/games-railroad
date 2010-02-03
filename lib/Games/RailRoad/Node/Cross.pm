@@ -5,12 +5,12 @@ use warnings;
 package Games::RailRoad::Node::Cross;
 # ABSTRACT: a node object with 4 branches
 
-use base qw{ Games::RailRoad::Node };
+use Moose;
+extends qw{ Games::RailRoad::Node };
 
-
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
-
 
 =head1 DESCRIPTION
 
