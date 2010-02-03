@@ -10,14 +10,14 @@ use base qw{ Class::Accessor::Fast };
 __PACKAGE__->mk_accessors( qw{ x y } );
 
 use overload
-	'='   => \&copy,
-	'+'   => \&_add,
-	'-'   => \&_substract,
-	'neg' => \&_invert,
-	'+='  => \&_add_inplace,
+    '='   => \&copy,
+    '+'   => \&_add,
+    '-'   => \&_substract,
+    'neg' => \&_invert,
+    '+='  => \&_add_inplace,
     '-='  => \&_substract_inplace,
     '<=>' => \&_compare,
-	'""'  => \&as_string;
+    '""'  => \&as_string;
 
 Readonly my %coords2dir => (
     '(-1,-1)' => 'nw',
@@ -50,12 +50,12 @@ Readonly my %dir2coords => (
 # representing the x and y coordinates.
 #
 sub new {
-	my $pkg = shift;
+    my $pkg = shift;
 
     # regular GRV object
     my $self = { x=>$_[0], y=>$_[1] };
     bless $self, $pkg;
-	return $self;
+    return $self;
 }
 
 
@@ -66,7 +66,7 @@ sub new {
 # are C<e>, C<n>, C<ne>, C<nw>, C<s>, C<se>, C<sw>, C<w>.
 #
 sub new_dir {
-	my ($pkg, $dir) = @_;
+    my ($pkg, $dir) = @_;
 
     return $pkg->new( @{ $dir2coords{$dir} } );
 }
@@ -96,8 +96,8 @@ sub copy {
 # like "(1,2)".
 #
 sub as_string {
-	my $self = shift;
-	return '(' . $self->x . ',' . $self->y . ')';
+    my $self = shift;
+    return '(' . $self->x . ',' . $self->y . ')';
 }
 
 
@@ -124,11 +124,11 @@ sub as_dir {
 # Return a new GRV object, which is the result of $v1 plus $v2.
 #
 sub _add {
-	my ($v1, $v2) = @_;
+    my ($v1, $v2) = @_;
     my $rv = ref($v1)->new( {x=>0, y=>0} );
     $rv->x( $v1->x + $v2->x );
     $rv->y( $v1->y + $v2->y );
-	return $rv;
+    return $rv;
 }
 
 
@@ -139,11 +139,11 @@ sub _add {
 # Return a new GRV object, which is the result of $v1 minus $v2.
 #
 sub _substract {
-	my ($v1, $v2) = @_;
+    my ($v1, $v2) = @_;
     my $rv = ref($v1)->new( {x=>0, y=>0} );
     $rv->x( $v1->x - $v2->x );
     $rv->y( $v1->y - $v2->y );
-	return $rv;
+    return $rv;
 }
 
 
@@ -161,7 +161,7 @@ sub _invert {
     my $rv = ref($v1)->new( {x=>0, y=>0} );
     $rv->x( - $v1->x );
     $rv->y( - $v1->y );
-	return $rv;
+    return $rv;
 }
 
 
@@ -176,7 +176,7 @@ sub _add_inplace {
     my ($v1, $v2) = @_;
     $v1->x( $v1->x + $v2->x );
     $v1->y( $v1->y + $v2->y );
-	return $v1;
+    return $v1;
 }
 
 
@@ -190,7 +190,7 @@ sub _substract_inplace {
     my ($v1, $v2) = @_;
     $v1->x( $v1->x - $v2->x );
     $v1->y( $v1->y - $v2->y );
-	return $v1;
+    return $v1;
 }
 
 
