@@ -5,11 +5,11 @@ use warnings;
 package Games::RailRoad::Node::Switch::NW_SE_W;
 # ABSTRACT: a given type of node...
 
-use base qw{ Games::RailRoad::Node::Switch };
+use Moose;
+extends qw{ Games::RailRoad::Node::Switch };
 
 
-
-# -- PRIVATE METHODS
+# -- private methods
 
 sub _next_map {
     return {
@@ -33,29 +33,11 @@ sub _transform_map {
 }
 
 
+__PACKAGE__->meta->make_immutable;
 1;
 __END__
-
 
 =head1 DESCRIPTION
 
 This package provides a node object. Refer to L<Games::RailRoad::Node>
 for a description of the various node types.
-
-
-
-=head1 METHODS
-
-This class implements the following methods as defined in
-L<Games::RailRoad::Node>:
-
-=over 4
-
-=item * new
-
-
-=back
-
-
-Refer to the documentation in L<Games::RailRoad::Node> to learn more
-about them.
