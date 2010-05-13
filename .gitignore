@@ -10,6 +10,9 @@
 *.swp
 *.tmp
 
+# private stuff
+private
+
 # avoid utility files
 .build
 _build
